@@ -1,0 +1,85 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace = 'com.terroroo.dobsongomenu'
+    compileSdk = 36 //Rework complet du BLE dans l'API 37, ça ne vaut pas le coup de se faire chier à tout refaire
+
+    packagingOptions {
+        exclude "META-INF/**"
+        exclude "**/*.class"
+        exclude "**/*.kt"
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.terroroo.dobsongomenu"
+        minSdk = 26
+        targetSdk = 36 //Rework complet du BLE dans l'API 37, ça ne vaut pas le coup de se faire chier à tout refaire
+        versionCode 1
+        versionName "1.0"
+
+        multiDexEnabled false
+
+        externalNativeBuild {
+            cmake {
+                cppFlags '-std=c++17'
+            }
+        }
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
+
+    buildFeatures {
+        prefab true
+        viewBinding false
+        dataBinding false
+        resValues false
+    }
+
+}
+
+dependencies {
+    implementation(fileTree(dir: "libs", include: ["*.jar"]))
+    implementation (libs.webkit)
+    implementation libs.shadowhook
+    implementation libs.hipparchus.core
+    implementation libs.hipparchus.filtering
+    implementation libs.hipparchus.fitting
+    implementation libs.hipparchus.geometry
+    implementation libs.hipparchus.ode
+    implementation libs.hipparchus.optim
+    implementation libs.hipparchus.stat
+    implementation libs.orekit
+
+    //implementation libs.appcompat
+    //implementation libs.material
+    //implementation libs.constraintlayout
+    //testImplementation libs.junit
+    //androidTestImplementation libs.ext.junit
+    //androidTestImplementation libs.espresso.core
+}

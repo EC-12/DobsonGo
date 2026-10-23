@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ######## ATTRIBUTS DOBSON GO MENU ######## -->
+    <declare-styleable name="DobsonGoAttrs">
+        <attr name="scrollable_max_height" format="dimension"/>
+        <attr name="scrollable_title" format="string"/>
+        <attr name="sub_menu_title" format="string"/>
+    </declare-styleable>
+    <!-- ################################ -->
+</resources>

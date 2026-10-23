@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" width="900" height="420" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F2A44"/>
+    </marker>
+    <marker id="blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2F6FDE"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="898" height="418" rx="16" fill="#F7F9FC" stroke="#D0D7E2" stroke-width="2"/>
+  <text x="30" y="40" font-size="20" font-weight="700" fill="#1F2A44">The floating menu</text>
+  <text x="30" y="62" font-size="13" fill="#5A6478">An HTML overlay on top of the stargazing app, bridged back to Java</text>
+
+  <!-- Left: phone screen with overlay -->
+  <rect x="40" y="90" width="210" height="300" rx="18" fill="#10131A" stroke="#1F2A44" stroke-width="2.5"/>
+  <g fill="#FFFFFF" opacity="0.8">
+    <circle cx="80" cy="140" r="1.5"/><circle cx="150" cy="120" r="1.2"/><circle cx="200" cy="175" r="1.6"/>
+    <circle cx="95" cy="230" r="1.3"/><circle cx="175" cy="300" r="1.5"/><circle cx="120" cy="330" r="1.2"/>
+    <circle cx="210" cy="260" r="1.1"/>
+  </g>
+  <text x="145" y="115" font-size="10" fill="#8A94A6" text-anchor="middle">stargazing app</text>
+  <!-- Floating round menu -->
+  <circle cx="200" cy="340" r="26" fill="#2F6FDE" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="200" y="345" font-size="18" fill="#FFFFFF" text-anchor="middle">☰</text>
+  <text x="145" y="372" font-size="9.5" fill="#8A94A6" text-anchor="middle">draggable round button</text>
+
+  <!-- Opened menu panel -->
+  <rect x="78" y="150" width="150" height="110" rx="10" fill="#FFFFFF" stroke="#2F6FDE" stroke-width="2"/>
+  <text x="92" y="172" font-size="11" font-weight="700" fill="#1F2A44">Jupiter</text>
+  <rect x="92" y="182" width="120" height="26" rx="13" fill="#2E9E6B"/>
+  <text x="152" y="199" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">Track</text>
+  <text x="92" y="228" font-size="9.5" fill="#5A6478">rendered in HTML</text>
+  <text x="92" y="243" font-size="9.5" fill="#5A6478">inside a WebView</text>
+
+  <!-- Flow boxes -->
+  <g font-size="12.5" fill="#1F2A44" text-anchor="middle">
+    <rect x="300" y="150" width="150" height="56" rx="8" fill="#DCE8FB" stroke="#2F6FDE" stroke-width="2"/>
+    <text x="375" y="174" font-weight="700">WebView</text>
+    <text x="375" y="192" font-size="11" fill="#5A6478">HTML + CSS menu</text>
+
+    <rect x="480" y="150" width="150" height="56" rx="8" fill="#FFFFFF" stroke="#1F2A44" stroke-width="2"/>
+    <text x="555" y="174" font-weight="700">JavaScript</text>
+    <text x="555" y="192" font-size="11" fill="#5A6478">handles the tap</text>
+
+    <rect x="660" y="150" width="200" height="56" rx="8" fill="#E9F6EF" stroke="#2E9E6B" stroke-width="2"/>
+    <text x="760" y="170" font-weight="700">Java (JS interface)</text>
+    <text x="760" y="188" font-size="11" fill="#5A6478">receives the action</text>
+  </g>
+
+  <line x1="450" y1="178" x2="476" y2="178" stroke="#1F2A44" stroke-width="2" marker-end="url(#ink)"/>
+  <line x1="630" y1="178" x2="656" y2="178" stroke="#1F2A44" stroke-width="2" marker-end="url(#ink)"/>
+  <line x1="228" y1="195" x2="296" y2="178" stroke="#1F2A44" stroke-width="2" marker-end="url(#ink)"/>
+
+  <!-- Down to BLE -->
+  <line x1="760" y1="206" x2="760" y2="300" stroke="#2F6FDE" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#blue)"/>
+  <rect x="660" y="300" width="200" height="66" rx="10" fill="#E3E8F0" stroke="#1F2A44" stroke-width="2.5"/>
+  <text x="760" y="330" font-size="15" font-weight="700" fill="#1F2A44" text-anchor="middle">ESP32</text>
+  <text x="760" y="350" font-size="11.5" fill="#5A6478" text-anchor="middle">receives the coordinates</text>
+  <text x="775" y="280" font-size="12" font-weight="700" fill="#2F6FDE">BLE</text>
+
+  <!-- caption of the flow -->
+  <text x="300" y="250" font-size="12" fill="#5A6478">User taps <tspan font-weight="700" fill="#1F2A44">Track</tspan> → a JavaScript function fires → it calls the</text>
+  <text x="300" y="268" font-size="12" fill="#5A6478">JavaScript interface → Java sends the coordinates to the ESP32.</text>
+</svg>

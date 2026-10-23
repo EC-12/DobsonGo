@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 590" width="900" height="590" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2F6FDE"/>
+    </marker>
+  </defs>
+
+  <!-- Card -->
+  <rect x="1" y="1" width="898" height="588" rx="16" fill="#F7F9FC" stroke="#D0D7E2" stroke-width="2"/>
+  <line x1="450" y1="30" x2="450" y2="565" stroke="#D0D7E2" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- ===================== Left: Equatorial ===================== -->
+  <text x="30" y="44" font-size="20" font-weight="700" fill="#1F2A44">Equatorial mount</text>
+  <text x="30" y="66" font-size="14" fill="#5A6478">One axis is aligned with the Earth's axis</text>
+
+  <!-- Pole star -->
+  <g transform="translate(392,82)">
+    <path d="M0 -11 L3 -3 L11 0 L3 3 L0 11 L-3 3 L-11 0 L-3 -3 Z" fill="#E8A317" stroke="#B07A0C" stroke-width="1"/>
+  </g>
+  <text x="392" y="60" font-size="13" fill="#B07A0C" text-anchor="middle">Pole star</text>
+
+  <!-- Polar axis line (towards the pole star) -->
+  <line x1="200" y1="335" x2="386" y2="88" stroke="#2F6FDE" stroke-width="1.5" stroke-dasharray="5 5"/>
+
+  <!-- Ground -->
+  <line x1="40" y1="455" x2="420" y2="455" stroke="#B8C0CC" stroke-width="2"/>
+
+  <!-- Latitude angle -->
+  <line x1="200" y1="335" x2="300" y2="335" stroke="#5A6478" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <path d="M270 335 A70 70 0 0 0 242.1 279.1" fill="none" stroke="#5A6478" stroke-width="1.5"/>
+  <text x="276" y="320" font-size="13" fill="#5A6478">53°</text>
+
+  <!-- Tripod -->
+  <g stroke="#5A6478" stroke-width="6" stroke-linecap="round">
+    <line x1="205" y1="338" x2="208" y2="440" stroke="#A3ACBA"/>
+    <line x1="200" y1="338" x2="115" y2="455"/>
+    <line x1="200" y1="338" x2="285" y2="455"/>
+  </g>
+  <rect x="180" y="326" width="40" height="18" rx="4" fill="#8A94A6" stroke="#1F2A44" stroke-width="2"/>
+
+  <!-- Mount head, rotated so the polar axis points 53 degrees up -->
+  <g transform="translate(200,335) rotate(37)">
+    <!-- Telescope tube, parallel to the polar axis (pointing at the pole) -->
+    <rect x="-100" y="-235" width="56" height="215" rx="4" fill="#FFFFFF" stroke="#1F2A44" stroke-width="2.5"/>
+    <rect x="-103" y="-240" width="62" height="12" rx="3" fill="#1F2A44"/>
+    <rect x="-116" y="-212" width="16" height="18" fill="#C9D2DF" stroke="#1F2A44" stroke-width="1.5"/>
+    <!-- Declination axis + counterweight bar -->
+    <line x1="-44" y1="-105" x2="140" y2="-105" stroke="#5A6478" stroke-width="9" stroke-linecap="round"/>
+    <rect x="105" y="-128" width="30" height="46" rx="4" fill="#3D475C" stroke="#1F2A44" stroke-width="1.5"/>
+    <!-- Polar axis housing -->
+    <rect x="-15" y="-95" width="30" height="95" rx="6" fill="#8A94A6" stroke="#1F2A44" stroke-width="2"/>
+    <!-- Declination housing -->
+    <rect x="-20" y="-120" width="40" height="30" rx="6" fill="#8A94A6" stroke="#1F2A44" stroke-width="2"/>
+    <!-- Rotation arrow around the polar axis -->
+    <path d="M-30 -50 A30 11 0 0 0 30 -50" fill="none" stroke="#2F6FDE" stroke-width="2.5" marker-end="url(#blue)"/>
+  </g>
+
+  <!-- Labels left -->
+  <g font-size="13" fill="#1F2A44">
+    <text x="30" y="368" font-weight="700">Polar axis</text>
+    <text x="30" y="386">one motor turns it at</text>
+    <text x="30" y="404">a constant speed</text>
+    <line x1="150" y1="362" x2="218" y2="310" stroke="#5A6478" stroke-width="1.2"/>
+    <text x="355" y="398" text-anchor="middle">Counterweight</text>
+    <line x1="358" y1="384" x2="362" y2="356" stroke="#5A6478" stroke-width="1.2"/>
+  </g>
+
+  <!-- Caption left -->
+  <text x="30" y="538" font-size="15" font-weight="700" fill="#2F6FDE">Tracking: one motor, at a constant speed</text>
+  <text x="30" y="560" font-size="13" fill="#5A6478">Easy to automate: the favourite of astrophotographers</text>
+
+  <!-- ===================== Right: Dobsonian ===================== -->
+  <text x="480" y="44" font-size="20" font-weight="700" fill="#1F2A44">Dobsonian mount</text>
+  <text x="480" y="66" font-size="14" fill="#5A6478">Both axes are aligned with the horizon (alt-azimuth)</text>
+
+  <!-- Ground -->
+  <line x1="480" y1="455" x2="870" y2="455" stroke="#B8C0CC" stroke-width="2"/>
+
+  <!-- Tube (behind the rocker box) -->
+  <g transform="translate(670,330) rotate(-40)">
+    <rect x="-100" y="-50" width="330" height="100" fill="#FFFFFF" stroke="#1F2A44" stroke-width="2.5"/>
+    <rect x="190" y="-66" width="22" height="16" fill="#C9D2DF" stroke="#1F2A44" stroke-width="1.5"/>
+    <rect x="224" y="-52" width="8" height="104" fill="#1F2A44"/>
+  </g>
+
+  <!-- Ground board -->
+  <rect x="540" y="437" width="260" height="14" rx="3" fill="#C49A6C" stroke="#7A5530" stroke-width="2"/>
+  <!-- Rocker box (side board with a notch for the bearing) -->
+  <path d="M560 437 L560 330 L630 330 A40 40 0 0 0 710 330 L780 330 L780 437 Z" fill="#D9B382" stroke="#7A5530" stroke-width="2"/>
+  <!-- Altitude bearing -->
+  <circle cx="670" cy="330" r="38" fill="#E9D3B0" stroke="#7A5530" stroke-width="2.5"/>
+  <circle cx="670" cy="330" r="4" fill="#7A5530"/>
+
+  <!-- Altitude arrow -->
+  <path d="M651.4 260.5 A72 72 0 0 0 600.5 311.4" fill="none" stroke="#2F6FDE" stroke-width="2.5" marker-start="url(#blue)" marker-end="url(#blue)"/>
+  <!-- Azimuth arrow -->
+  <path d="M525 463 A145 13 0 0 0 815 463" fill="none" stroke="#2F6FDE" stroke-width="2.5" marker-start="url(#blue)" marker-end="url(#blue)"/>
+
+  <!-- Labels right -->
+  <g font-size="13" fill="#1F2A44">
+    <text x="480" y="238" font-weight="700">Altitude</text>
+    <text x="480" y="256">tilts up and down</text>
+    <text x="670" y="494" text-anchor="middle"><tspan font-weight="700">Azimuth</tspan>: turns left and right</text>
+    <text x="800" y="395">Rocker box</text>
+  </g>
+
+  <!-- Caption right -->
+  <text x="480" y="538" font-size="15" font-weight="700" fill="#2F6FDE">Tracking: two motors, speeds always changing</text>
+  <text x="480" y="560" font-size="13" fill="#5A6478">Harder to automate, but can carry huge mirrors</text>
+</svg>

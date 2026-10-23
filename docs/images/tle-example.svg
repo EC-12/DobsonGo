@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" width="900" height="430" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2F6FDE"/></marker>
+    <marker id="green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2E9E6B"/></marker>
+    <marker id="ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1F2A44"/></marker>
+    <marker id="red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#E25C5C"/></marker>
+    <marker id="amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B07A0C"/></marker>
+    
+  </defs>
+  <rect x="1" y="1" width="898" height="428" rx="16" fill="#F7F9FC" stroke="#D0D7E2" stroke-width="2"/>
+  <text x="30" y="44" font-size="20" font-weight="700" fill="#1F2A44">Reading a two-line element set (TLE)</text>
+  <text x="30" y="66" font-size="14" fill="#5A6478">TLE of the International Space Station, 20 September 2008 (the example used on Wikipedia)</text>
+  <rect x="66.7" y="141" width="61.0" height="26" rx="4" fill="#2F6FDE" fill-opacity="0.16" stroke="#2F6FDE" stroke-width="1.5"/>
+  <rect x="252.3" y="141" width="165.4" height="26" rx="4" fill="#B07A0C" fill-opacity="0.16" stroke="#B07A0C" stroke-width="1.5"/>
+  <rect x="658.3" y="141" width="95.8" height="26" rx="4" fill="#E25C5C" fill-opacity="0.16" stroke="#E25C5C" stroke-width="1.5"/>
+  <rect x="136.3" y="271" width="95.8" height="26" rx="4" fill="#2E9E6B" fill-opacity="0.16" stroke="#2E9E6B" stroke-width="1.5"/>
+  <rect x="240.7" y="271" width="95.8" height="26" rx="4" fill="#2E9E6B" fill-opacity="0.16" stroke="#2E9E6B" stroke-width="1.5"/>
+  <rect x="345.1" y="271" width="84.2" height="26" rx="4" fill="#2E9E6B" fill-opacity="0.16" stroke="#2E9E6B" stroke-width="1.5"/>
+  <rect x="437.9" y="271" width="95.8" height="26" rx="4" fill="#2E9E6B" fill-opacity="0.16" stroke="#2E9E6B" stroke-width="1.5"/>
+  <rect x="542.3" y="271" width="95.8" height="26" rx="4" fill="#2F6FDE" fill-opacity="0.16" stroke="#2F6FDE" stroke-width="1.5"/>
+  <rect x="646.7" y="271" width="130.6" height="26" rx="4" fill="#2F6FDE" fill-opacity="0.16" stroke="#2F6FDE" stroke-width="1.5"/>
+  <text x="45" y="112" font-size="19" font-family="DejaVu Sans Mono, Menlo, Consolas, Courier New, monospace" fill="#5A6478">ISS (ZARYA)</text>
+  <text x="45" y="160" font-size="19" font-family="DejaVu Sans Mono, Menlo, Consolas, Courier New, monospace" fill="#1F2A44" xml:space="preserve" style="white-space:pre" textLength="800.4" lengthAdjust="spacingAndGlyphs">1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927</text>
+  <text x="45" y="290" font-size="19" font-family="DejaVu Sans Mono, Menlo, Consolas, Courier New, monospace" fill="#1F2A44" xml:space="preserve" style="white-space:pre" textLength="800.4" lengthAdjust="spacingAndGlyphs">2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537</text>
+  <line x1="97.2" y1="168" x2="97.2" y2="192" stroke="#2F6FDE" stroke-width="1.2"/>
+  <text x="97.2" y="206" font-size="12" font-weight="700" fill="#2F6FDE" text-anchor="middle">Catalogue number</text>
+  <text x="97.2" y="221" font-size="12" fill="#5A6478" text-anchor="middle">25544 = the ISS</text>
+  <line x1="335.0" y1="168" x2="335.0" y2="192" stroke="#B07A0C" stroke-width="1.2"/>
+  <text x="335.0" y="206" font-size="12" font-weight="700" fill="#B07A0C" text-anchor="middle">Epoch</text>
+  <text x="335.0" y="221" font-size="12" fill="#5A6478" text-anchor="middle">2008, day 264.518 = 20 Sept 2008, 12:25 UTC</text>
+  <line x1="706.2" y1="168" x2="706.2" y2="192" stroke="#E25C5C" stroke-width="1.2"/>
+  <text x="706.2" y="206" font-size="12" font-weight="700" fill="#E25C5C" text-anchor="middle">Drag term</text>
+  <text x="706.2" y="221" font-size="12" fill="#5A6478" text-anchor="middle">braking by the atmosphere</text>
+  <line x1="184.2" y1="298" x2="184.2" y2="322" stroke="#2E9E6B" stroke-width="1.2"/>
+  <text x="184.2" y="336" font-size="12" font-weight="700" fill="#2E9E6B" text-anchor="middle">Inclination</text>
+  <text x="184.2" y="351" font-size="12" fill="#5A6478" text-anchor="middle">51.64°</text>
+  <line x1="288.6" y1="298" x2="288.6" y2="322" stroke="#2E9E6B" stroke-width="1.2"/>
+  <text x="288.6" y="336" font-size="12" font-weight="700" fill="#2E9E6B" text-anchor="middle">Ascending node</text>
+  <text x="288.6" y="351" font-size="12" fill="#5A6478" text-anchor="middle">247.46°</text>
+  <line x1="387.2" y1="298" x2="387.2" y2="322" stroke="#2E9E6B" stroke-width="1.2"/>
+  <text x="387.2" y="336" font-size="12" font-weight="700" fill="#2E9E6B" text-anchor="middle">Eccentricity</text>
+  <text x="387.2" y="351" font-size="12" fill="#5A6478" text-anchor="middle">0.0006703</text>
+  <line x1="485.8" y1="298" x2="485.8" y2="322" stroke="#2E9E6B" stroke-width="1.2"/>
+  <text x="485.8" y="336" font-size="12" font-weight="700" fill="#2E9E6B" text-anchor="middle">Arg. of perigee</text>
+  <text x="485.8" y="351" font-size="12" fill="#5A6478" text-anchor="middle">130.54°</text>
+  <line x1="590.2" y1="298" x2="590.2" y2="322" stroke="#2F6FDE" stroke-width="1.2"/>
+  <text x="590.2" y="336" font-size="12" font-weight="700" fill="#2F6FDE" text-anchor="middle">Mean anomaly</text>
+  <text x="590.2" y="351" font-size="12" fill="#5A6478" text-anchor="middle">325.03°</text>
+  <line x1="712.0" y1="298" x2="712.0" y2="322" stroke="#2F6FDE" stroke-width="1.2"/>
+  <text x="712.0" y="336" font-size="12" font-weight="700" fill="#2F6FDE" text-anchor="middle">Mean motion</text>
+  <text x="712.0" y="351" font-size="12" fill="#5A6478" text-anchor="middle">15.72 orbits/day</text>
+  <text x="30" y="410" font-size="13" fill="#5A6478">Green: orientation and shape of the orbit. Blue: position of the satellite along the orbit. 15.72 orbits per day means one orbit every 91.6 minutes.</text>
+
+</svg>

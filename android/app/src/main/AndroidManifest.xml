@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <!-- ############# AJOUTER : xmlns:tools="http://schemas.android.com/tools" = c'est un namespace pour les perms ############# -->
+
+    <!-- ############# AJOUTER les attributs : res/values/attrs.xml (ouvrir le fichier et copier les valeurs) ############# -->
+
+    <!-- ######## PERMISSIONS DOBSON GO MENU ######## -->
+    <!-- Internet pour Horizons API -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Overlay -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Obligatoire si l'appareil a du Bluetooth -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
+    <!-- Android < 12 (API < 31) : permissions "legacy" -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <!-- Localisation obligatoire -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+    <!-- Android 12+ (API 31+) : nouvelles permissions runtime BLE -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" tools:targetApi="31" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- ################################ -->
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/app_icon"
+        android:label="DobsonGoMenu"
+        android:roundIcon="@mipmap/app_icon_round"
+        android:supportsRtl="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- ######## SERVICES ET ACTIVITY DOBSON GO MENU ######## -->
+        <activity android:name="com.terroroo.dobsongomenu.ExitActivity" android:theme="@android:style/Theme.NoDisplay" android:autoRemoveFromRecents="true"/>
+        <service android:name="com.terroroo.dobsongomenu.AppMenuService" android:enabled="true" android:exported="false" android:stopWithTask="true" />
+        <!-- ################################ -->
+    </application>
+
+</manifest>

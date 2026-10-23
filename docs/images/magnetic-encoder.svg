@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2F6FDE"/>
+    </marker>
+    <marker id="dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5A6478"/>
+    </marker>
+    <marker id="green" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2E9E6B"/>
+    </marker>
+    <marker id="white" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#FFFFFF"/>
+    </marker>
+  </defs>
+
+  <!-- Card -->
+  <rect x="1" y="1" width="898" height="398" rx="16" fill="#F7F9FC" stroke="#D0D7E2" stroke-width="2"/>
+  <text x="30" y="44" font-size="20" font-weight="700" fill="#1F2A44">Measuring the angle with a magnetic encoder</text>
+  <text x="30" y="66" font-size="14" fill="#5A6478">The magnet turns with the axis; the sensor stays still and reads the direction of its magnetic field</text>
+  <line x1="612" y1="95" x2="612" y2="375" stroke="#D0D7E2" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- ===================== Left: side view ===================== -->
+  <!-- Mount (bearing block) -->
+  <rect x="150" y="150" width="60" height="110" rx="4" fill="#D9B382" stroke="#7A5530" stroke-width="2"/>
+  <text x="180" y="282" font-size="13" fill="#5A6478" text-anchor="middle">Mount</text>
+
+  <!-- Axis -->
+  <rect x="90" y="185" width="340" height="40" rx="4" fill="#C9D2DF" stroke="#1F2A44" stroke-width="2"/>
+  <text x="325" y="252" font-size="13" fill="#1F2A44">Telescope axis</text>
+
+  <!-- Rotation arrow around the axis -->
+  <path d="M300 169 A12 36 0 0 1 300 241" fill="none" stroke="#2F6FDE" stroke-width="2.5" marker-end="url(#blue)"/>
+  <text x="300" y="158" font-size="13" fill="#2F6FDE" text-anchor="middle">turns with the telescope</text>
+
+  <!-- Magnet (diametrically magnetised) -->
+  <rect x="430" y="180" width="20" height="25" fill="#E25C5C" stroke="#1F2A44" stroke-width="1.5"/>
+  <rect x="430" y="205" width="20" height="25" fill="#4A7BD0" stroke="#1F2A44" stroke-width="1.5"/>
+  <text x="440" y="197" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">N</text>
+  <text x="440" y="222" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle">S</text>
+
+  <!-- Sensor board and chip -->
+  <rect x="480" y="150" width="12" height="110" rx="2" fill="#2E9E6B" stroke="#1E6B48" stroke-width="1.5"/>
+  <rect x="468" y="192" width="12" height="26" rx="2" fill="#1F2A44"/>
+
+  <!-- Air gap -->
+  <line x1="451" y1="246" x2="467" y2="246" stroke="#5A6478" stroke-width="1.5" marker-start="url(#dim)" marker-end="url(#dim)"/>
+  <line x1="450" y1="234" x2="450" y2="252" stroke="#5A6478" stroke-width="1"/>
+  <line x1="468" y1="222" x2="468" y2="252" stroke="#5A6478" stroke-width="1"/>
+  <text x="459" y="272" font-size="13" fill="#5A6478" text-anchor="middle">≤ 5 mm</text>
+
+  <!-- Wire to the ESP32 -->
+  <path d="M486 260 L486 318" fill="none" stroke="#2E9E6B" stroke-width="2.5" marker-end="url(#green)"/>
+  <text x="486" y="342" font-size="13" fill="#2E9E6B" text-anchor="middle">angle sent to the ESP32 (SPI)</text>
+
+  <!-- Labels -->
+  <g font-size="13" fill="#1F2A44">
+    <text x="340" y="112" font-weight="700">Magnet</text>
+    <text x="340" y="128">on the end of the axis</text>
+    <line x1="420" y1="133" x2="437" y2="178" stroke="#5A6478" stroke-width="1.2"/>
+    <text x="505" y="112" font-weight="700">Sensor</text>
+    <text x="505" y="128">does not move</text>
+    <line x1="508" y1="133" x2="490" y2="150" stroke="#5A6478" stroke-width="1.2"/>
+  </g>
+
+  <!-- ===================== Right: what the sensor sees ===================== -->
+  <text x="745" y="112" font-size="14" font-weight="700" fill="#1F2A44" text-anchor="middle">What the sensor sees</text>
+
+  <!-- Reference direction and angle -->
+  <line x1="745" y1="205" x2="835" y2="205" stroke="#5A6478" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <path d="M820 205 A75 75 0 0 0 802.4 156.8" fill="none" stroke="#2F6FDE" stroke-width="2" marker-end="url(#blue)"/>
+  <text x="826" y="178" font-size="16" font-style="italic" fill="#2F6FDE">θ</text>
+
+  <!-- Magnet seen from the end -->
+  <g transform="translate(745,205) rotate(50)">
+    <path d="M-60 0 A60 60 0 0 1 60 0 Z" fill="#E25C5C" stroke="#1F2A44" stroke-width="1.5"/>
+    <path d="M-60 0 A60 60 0 0 0 60 0 Z" fill="#4A7BD0" stroke="#1F2A44" stroke-width="1.5"/>
+  </g>
+  <text x="737" y="176" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">N</text>
+  <text x="737" y="250" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">S</text>
+  <!-- Field direction -->
+  <line x1="745" y1="205" x2="779.5" y2="176.1" stroke="#FFFFFF" stroke-width="3" marker-end="url(#white)"/>
+  <circle cx="745" cy="205" r="3.5" fill="#1F2A44"/>
+
+  <!-- Explanation -->
+  <g font-size="13" fill="#1F2A44" text-anchor="middle">
+    <text x="745" y="294">The direction of the field gives</text>
+    <text x="745" y="311">an angle θ between 0 and 360°</text>
+    <text x="745" y="340" font-weight="700" fill="#2F6FDE">18 bits: 262,144 positions per turn</text>
+    <text x="745" y="358" fill="#5A6478">about 0.0014°, or 5 arcseconds</text>
+  </g>
+</svg>

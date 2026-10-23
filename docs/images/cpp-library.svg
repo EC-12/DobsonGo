@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1F2A44"/>
+    </marker>
+    <marker id="blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2F6FDE"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="898" height="518" rx="16" fill="#F7F9FC" stroke="#D0D7E2" stroke-width="2"/>
+  <text x="30" y="40" font-size="20" font-weight="700" fill="#1F2A44">Reading coordinates from the app</text>
+  <text x="30" y="62" font-size="13" fill="#5A6478">The custom C++ library intercepts a call inside the app and passes the result to the Java menu</text>
+
+  <!-- Phone outline -->
+  <rect x="40" y="86" width="500" height="406" rx="18" fill="#FFFFFF" stroke="#1F2A44" stroke-width="2.5"/>
+  <text x="60" y="112" font-size="13" font-weight="700" fill="#5A6478">ANDROID PHONE</text>
+
+  <!-- Third-party app box -->
+  <rect x="64" y="128" width="452" height="150" rx="10" fill="#EEF1F6" stroke="#8A94A6" stroke-width="2"/>
+  <text x="80" y="152" font-size="14" font-weight="700" fill="#1F2A44">Third-party stargazing app (Unity, IL2CPP)</text>
+  <rect x="80" y="166" width="196" height="96" rx="8" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.5"/>
+  <text x="178" y="188" font-size="12.5" fill="#1F2A44" text-anchor="middle">Native libraries (.so)</text>
+  <text x="178" y="208" font-size="11.5" fill="#5A6478" text-anchor="middle">compute object positions</text>
+  <text x="178" y="224" font-size="11.5" fill="#5A6478" text-anchor="middle">in memory</text>
+  <text x="178" y="248" font-size="11.5" fill="#1F2A44" text-anchor="middle" font-style="italic">e.g. Jupiter → RA/Dec</text>
+
+  <!-- My C++ lib -->
+  <rect x="300" y="166" width="196" height="96" rx="8" fill="#DCE8FB" stroke="#2F6FDE" stroke-width="2"/>
+  <text x="398" y="188" font-size="12.5" font-weight="700" fill="#1F2A44" text-anchor="middle">My C++ library (.so)</text>
+  <text x="398" y="208" font-size="11.5" fill="#1F2A44" text-anchor="middle">ShadowHook</text>
+  <text x="398" y="224" font-size="11" fill="#5A6478" text-anchor="middle">(inline hook)</text>
+  <text x="398" y="248" font-size="11" fill="#5A6478" text-anchor="middle">loaded into the app</text>
+
+  <!-- intercept arrow -->
+  <line x1="300" y1="214" x2="280" y2="214" stroke="#2F6FDE" stroke-width="2.5" marker-end="url(#blue)"/>
+  <text x="225" y="291" font-size="11.5" fill="#2F6FDE" text-anchor="middle">① hooks the function, reads the instance</text>
+
+  <!-- Java menu box -->
+  <rect x="64" y="300" width="452" height="80" rx="10" fill="#E9F6EF" stroke="#2E9E6B" stroke-width="2"/>
+  <text x="80" y="324" font-size="14" font-weight="700" fill="#1F2A44">Java menu code</text>
+  <text x="80" y="346" font-size="12" fill="#1F2A44">receives the coordinates, runs a few calculations,</text>
+  <text x="80" y="362" font-size="12" fill="#1F2A44">then sends them over BLE</text>
+
+  <!-- JNI arrow -->
+  <line x1="398" y1="262" x2="398" y2="298" stroke="#1F2A44" stroke-width="2.5" marker-end="url(#ink)"/>
+  <rect x="408" y="268" width="96" height="24" rx="4" fill="#FBEED9" stroke="#C99A2E" stroke-width="1.2"/>
+  <text x="456" y="285" font-size="12" fill="#8A6A17" text-anchor="middle">JNI bridge</text>
+
+  <!-- phone-internal load note -->
+  <text x="80" y="404" font-size="11.5" fill="#5A6478">Both .so libraries run inside the app's memory (loaded via System.loadLibrary).</text>
+  <text x="80" y="424" font-size="11.5" fill="#5A6478">JNI (Java Native Interface) is the standard bridge between native C/C++ and Java.</text>
+
+  <!-- BLE out -->
+  <line x1="290" y1="380" x2="290" y2="448" stroke="#2F6FDE" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#blue)"/>
+  <text x="305" y="418" font-size="12" font-weight="700" fill="#2F6FDE">BLE</text>
+
+  <!-- ESP32 -->
+  <rect x="600" y="400" width="250" height="70" rx="10" fill="#E3E8F0" stroke="#1F2A44" stroke-width="2.5"/>
+  <text x="725" y="432" font-size="16" font-weight="700" fill="#1F2A44" text-anchor="middle">ESP32</text>
+  <text x="725" y="452" font-size="12" fill="#5A6478" text-anchor="middle">drives the motors</text>
+  <line x1="290" y1="458" x2="596" y2="458" stroke="#2F6FDE" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#blue)"/>
+  <text x="440" y="451" font-size="11.5" fill="#2F6FDE" text-anchor="middle">target coordinates</text>
+</svg>

@@ -1,0 +1,220 @@
+package com.terroroo.dobsongomenu;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Base64;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewParent;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+
+/**
+ * <p>Persistent storage of the user's settings, such as the Bluetooth connection key.</p>
+ *
+ * <p>Values are saved in the app's private {@link android.content.SharedPreferences}. The class also
+ * prepares an AES-256 key in the <b>Android Keystore</b> and provides {@link #encrypt(String)} and
+ * {@link #decrypt(String)} to store values encrypted.</p>
+ *
+ * <p><b>Note:</b> encryption is currently disabled in {@link #storePref} and {@link #getPref}: values are
+ * stored in plain text. The encryption code is kept, ready to be enabled again.</p>
+ */
+public abstract class Prefs {
+    /** Alias of the AES key in the Android Keystore. */
+    private static final String KEY_ALIAS = "terroroo_dobsongo_aes_key";
+    /** Name of the SharedPreferences file of the app. */
+    private static final String PREFS_ALIAS = "terroroo_dobsongo_prefs";
+
+    /**
+     * <p>Prepares the encryption key used to protect the preferences.</p>
+     *
+     * <p>If no key exists yet in the Android Keystore under {@link #KEY_ALIAS}, a new AES-256 key is generated
+     * there, configured for the <b>GCM</b> mode (which both encrypts the data and checks its integrity).
+     * The key is created inside the Keystore and can never be extracted from it.</p>
+     *
+     * @throws Exception if the Android Keystore cannot be loaded or the key cannot be generated
+     */
+    public static void init() throws Exception {
+        // Load the Android Keystore
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+
+        if (!keyStore.containsAlias(KEY_ALIAS)) {
+            // Generator of an AES key stored inside the Keystore
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES,
+                "AndroidKeyStore"
+            );
+
+            // Key parameters
+            KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
+                KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT // The key can both encrypt and decrypt
+            )
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM) // GCM mode: encryption + integrity check
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE) // GCM does not use padding
+            .setKeySize(256) // 256-bit key
+            .build();
+
+
+            keyGenerator.init(spec);
+            keyGenerator.generateKey(); // The key is created inside the Keystore and never leaves it
+        }
+    }
+
+    /**
+     * <p>Walks up the view hierarchy from a view, and returns the first parent that has the given identifier.</p>
+     *
+     * @param child    the view to start from
+     * @param targetId identifier of the parent to find
+     * @return the matching parent view, or <code>null</code> if no parent has this identifier
+     */
+    public static View findParentById(View child, int targetId) {
+        ViewParent parent = child.getParent();
+
+        while (parent instanceof View) {
+            View parentView = (View) parent;
+
+            if (parentView.getId() == targetId) {
+                return parentView;
+            }
+
+            parent = parentView.getParent();
+        }
+
+        return null;
+    }
+
+    /**
+     * <p>Encrypts a text with the AES-256-GCM key of the Android Keystore.</p>
+     *
+     * <p>The result is a Base64 string containing, in this order:</p>
+     * <ol>
+     *   <li>the length of the initialisation vector (IV), on 4 bytes;</li>
+     *   <li>the IV, generated randomly for each encryption;</li>
+     *   <li>the encrypted data, followed by the GCM authentication tag.</li>
+     * </ol>
+     *
+     * @param plainText the text to encrypt
+     * @return the encrypted text, encoded in Base64
+     * @throws Exception if the key cannot be retrieved or the encryption fails
+     */
+    private static String encrypt(String plainText) throws Exception {
+        // Load the Android Keystore
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+
+        // Retrieve the secret key
+        SecretKey secretKey = (
+            (KeyStore.SecretKeyEntry) keyStore.getEntry(KEY_ALIAS, null)
+        ).getSecretKey();
+
+
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        byte[] iv = cipher.getIV(); // Random IV generated by the cipher (required by GCM)
+        byte[] cipherText = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+
+
+        ByteBuffer buffer = ByteBuffer.allocate(4 + iv.length + cipherText.length); // Payload: IV length + IV + encrypted data
+        buffer.putInt(iv.length);
+        buffer.put(iv);
+        buffer.put(cipherText);
+
+        return Base64.encodeToString(buffer.array(), Base64.NO_WRAP); // Base64, so that it can be stored as text
+    }
+
+    /**
+     * <p>Decrypts a text produced by {@link #encrypt(String)}.</p>
+     *
+     * <p>GCM also checks the authentication tag: if the stored data has been modified, the decryption fails
+     * instead of returning corrupted data.</p>
+     *
+     * @param encrypted the encrypted text, encoded in Base64
+     * @return the original text
+     * @throws Exception if the key cannot be retrieved, the data is malformed or its integrity check fails
+     */
+    private static String decrypt(String encrypted) throws Exception {
+        byte[] decoded = Base64.decode(encrypted, Base64.NO_WRAP);
+        ByteBuffer buffer = ByteBuffer.wrap(decoded);
+
+        int ivLength = buffer.getInt(); // Read the IV length, then the IV and the encrypted data
+        byte[] iv = new byte[ivLength];
+        buffer.get(iv);
+        byte[] cipherText = new byte[buffer.remaining()];
+        buffer.get(cipherText);
+
+        // Load the Android Keystore and retrieve the secret key
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        SecretKey secretKey = (
+            (KeyStore.SecretKeyEntry) keyStore.getEntry(KEY_ALIAS, null)
+        ).getSecretKey();
+
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        GCMParameterSpec spec = new GCMParameterSpec(128, iv); // 128-bit authentication tag
+
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+        byte[] clearText = cipher.doFinal(cipherText); // Also checks the integrity of the data
+
+        return new String(clearText, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * <p>Saves a value in the app's preferences.</p>
+     *
+     * <p><b>Note:</b> encryption is currently disabled, so the value is stored in plain text.</p>
+     *
+     * @param context context used to access the preferences
+     * @param key     name of the preference, for example <code>"BT_CONN_KEY"</code>
+     * @param value   value to store
+     * @throws Exception if the value cannot be encrypted (once encryption is enabled again)
+     */
+    public static void storePref(Context context, String key, String value) throws Exception {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_ALIAS, Context.MODE_PRIVATE);
+        //String encryptedValue = encrypt(value); // Encryption disabled for now: the value is stored in plain text
+        prefs.edit()
+            .putString(key, value) //encryptedValue)
+            .apply();
+    }
+
+    /**
+     * <p>Reads a value from the app's preferences.</p>
+     *
+     * @param context context used to access the preferences
+     * @param key     name of the preference
+     * @return the stored value, or <code>null</code> if it does not exist or cannot be read
+     */
+    public static String getPref(Context context, String key) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_ALIAS, Context.MODE_PRIVATE);
+        String encrypted = prefs.getString(key, null);
+        if (encrypted != null) {
+            try { return encrypted; }//decrypt(encrypted); }
+            catch (Exception e) {
+                Utils.Logcat("Unable to decrypt pref:\n" + Log.getStackTraceString(e), 2);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * <p>Deletes a value from the app's preferences.</p>
+     *
+     * @param context context used to access the preferences
+     * @param key     name of the preference to delete
+     */
+    public static void deletePref(Context context, String key) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_ALIAS, Context.MODE_PRIVATE);
+        prefs.edit()
+            .remove(key)
+            .apply();
+    }
+}

@@ -1,0 +1,25 @@
+# Custom exclusions
+*.apk
+
+# npm dependencies (Frida): reinstalled with npm install
+node_modules/
+
+# Android and C++ builds
+build/
+.gradle/
+.cxx/
+.externalNativeBuild/
+local.properties
+*.aab
+
+# Android Studio project files
+.idea/
+*.iml
+
+# Android signing keys
+*.jks
+*.keystore
+
+# Windows system files
+Thumbs.db
+desktop.ini

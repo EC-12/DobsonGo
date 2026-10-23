@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telescope GoTo — Mod Menu</title>
+<style>
+    /* ══════════════════════════════════════════ 1. BASE ═══════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+        --bg-deep:     #0e1520;
+        --bg-panel:    rgba(20, 28, 44, 0.97);
+        --bg-strip:    rgba(28, 38, 58, 0.92);
+        --border:      rgba(200, 70, 70, 0.3);
+        --accent:      #e05555;
+        --accent-glow: rgba(220, 70, 70, 0.35);
+        --amber:       #e8994a;
+        --blue:        #4e82cb;
+        --blue-glow:   rgba(78, 130, 203, 0.3);
+        --green:       #4ecb82;
+        --green-glow:  rgba(78, 203, 130, 0.3);
+        --text-main:   #e0cece;
+        --text-dim:    rgba(180, 148, 148, 0.6);
+        --text-mono:   #c47878;
+        --font-ui:     'Exo 2', sans-serif;
+        --font-mono:   'Share Tech Mono', monospace;
+        --radius:      10px;
+        --panel-w:     290px;
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: var(--font-ui);
+    }
+
+    /* ═══════════════════════════════════════ 2. ANIMATIONS ════════════════════════════════════════ */
+    @keyframes scan-blink {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 1; }
+    }
+
+    @keyframes fade-up {
+        from { opacity:0; transform:translateY(4px); }
+        to { opacity:1; transform:translateY(0); }
+    }
+
+    @keyframes slide-in {
+        from { opacity:0; transform:translateY(-3px); }
+        to { opacity:1; transform:translateY(0); }
+    }
+
+    @keyframes pulse-green {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+
+    @keyframes track-pulse {
+        0%, 100% { box-shadow: 0 0 10px var(--green-glow); }
+        50% { box-shadow: 0 0 22px rgba(78, 203, 130, 0.5); }
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes card-pop-out {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(10px) scale(0.95);
+        }
+    }
+
+    @keyframes slide-in-left {
+        from {
+            opacity: 0;
+            transform: translateX(-12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slide-out-left {
+        0% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        20% {
+            transform: translateX(4px);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+    }
+
+    @keyframes tap-scale {
+        0% {
+            transform: scale(1);
+        }
+        40% {
+            transform: scale(1.04);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes cc-pop {
+        0%   { opacity:0; transform:scale(0.4); }
+        60%  { opacity:1; transform:scale(1.18); }
+        100% { opacity:1; transform:scale(1); }
+    }
+
+    @keyframes cc-dots-blink {
+        0%   { clip-path: inset(0 100% 0 0); }
+        33%  { clip-path: inset(0 66% 0 0); }
+        66%  { clip-path: inset(0 33% 0 0); }
+        100% { clip-path: inset(0 0 0 0); }
+    }
+
+    /* ════════════════════════════════════ 3. SHARED COMPONENTS ════════════════════════════════════ */
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); flex-shrink: 0; }
+
+    /* ── Navigable lists ── */
+    .list-header { display:flex; align-items:center; justify-content:space-between; }
+    .list-title { font-size:8px; letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); font-family:var(--font-mono); }
+    .list { display:flex; flex-direction:column; gap:4px; overflow:hidden; scroll-behavior:smooth; padding: 3px 8px; /* add desired max-height manually */ }
+
+    .nav-arrow {
+        width: 22px; height: 22px; border-radius: 4px;
+        border: 1px solid rgba(200,70,70,0.25); background: none;
+        color: var(--text-dim); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.18s; flex-shrink: 0;
+    }
+    .nav-arrow:hover { border-color: var(--accent); color: var(--accent); background: rgba(220,70,70,0.1); }
+    .nav-arrow:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+
+    /* ── Checkbox ── */
+    .dobgo-checkbox { position:relative; width:14px; height:14px; flex-shrink:0; }
+    .dobgo-checkbox input { position:absolute; opacity:0; width:0; height:0; }
+    .dobgo-checkbox-box {
+        width:14px; height:14px; border-radius:3px; border:1px solid rgba(200,70,70,0.3);
+        background:rgba(14,20,32,0.7); display:flex; align-items:center; justify-content:center;
+        transition:all .18s;
+    }
+    .dobgo-checkbox input:checked + .dobgo-checkbox-box {
+        background:rgba(220,70,70,0.2); border-color:var(--accent);
+    }
+    .dobgo-checkbox input:checked + .dobgo-checkbox-box::after {
+        content:''; width:7px; height:4px; border-left:1.5px solid var(--accent);
+        border-bottom:1.5px solid var(--accent); transform:rotate(-45deg) translateY(-1px);
+        display:block;
+    }
+
+    /* ── Loader ── */
+    .dobgo-loader { display:flex; align-items:center; justify-content:center; gap:7px; padding:4px 0; }
+    .dobgo-spinner {
+        width:14px; height:14px; border:2px solid rgba(220,70,70,0.15);
+        border-top-color:var(--accent); border-radius:50%;
+        animation:spin .7s linear infinite;
+    }
+    .dobgo-loader-text { font-size:8px; font-family:var(--font-mono); color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; }
+
+    /* ── Error banner ── */
+    .error-banner {
+        display: flex;
+        align-items: center; gap: 7px;
+        background: rgba(180, 30, 30, 0.15);
+        border: 1px solid rgba(220, 60, 60, 0.4);
+        border-radius: 6px; padding: 8px 10px;
+        animation: fade-up 0.2s ease;
+    }
+    .error-banner-icon { color: var(--accent); flex-shrink: 0; margin-top: 0; display: flex; align-items: center; }
+    .error-banner-text { font-size: 10px; font-family: var(--font-mono); color: rgba(230,160,160,0.9); letter-spacing: 0.5px; line-height: 1.5; flex: 1; }
+
+    /* ── Top bar of the secondary screens ── */
+    .settings-topbar { display:flex; align-items:center; justify-content:space-between; }
+    .back-btn { display:flex; align-items:center; gap:5px; background:none; border:none; color:var(--accent); font-family:var(--font-mono); font-size:9px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; padding:0; transition:color 0.2s; }
+    .settings-page-title { font-size:9px; font-family:var(--font-mono); color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; }
+
+    /* ═════════════════════════════════════ 4. FLOATING BUTTON ═════════════════════════════════════ */
+    #icon_bubble {
+        width: 55px;
+        height: 55px;
+    }
+
+    /* ═════════════════════════════════════ 5. PANEL & HEADER ══════════════════════════════════════ */
+
+    /* ── Panel ── */
+    .panel {
+        width: var(--panel-w);
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 0 0 1px rgba(200,60,60,0.1), 0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,180,180,0.06);
+        backdrop-filter: blur(12px);
+        overflow: hidden; position: relative;
+    }
+    .panel::before, .panel::after {
+        content: ''; position: absolute; width: 12px; height: 12px;
+        border-color: rgba(200,70,70,0.45); border-style: solid; z-index: 2; pointer-events: none;
+    }
+    .panel::before { top: 5px; left: 5px;  border-width: 1px 0 0 1px; }
+    .panel::after  { top: 5px; right: 5px; border-width: 1px 1px 0 0; }
+    .panel-body { position: relative; overflow: hidden; }
+
+    /* ── Header ── */
+    .header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 10px 10px 10px 14px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(14, 20, 34, 0.85);
+        flex-shrink: 0;
+    }
+    .header-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent-glow); }
+    .header-titles { flex: 1; }
+    .header-title { font-size: 12px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text-main); }
+    .header-sub { font-size: 9px; font-family: var(--font-mono); color: var(--text-dim); letter-spacing: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+
+    .btn-icon {
+        width: 26px; height: 26px; border-radius: 5px;
+        border: 1px solid rgba(200,70,70,0.2); background: none;
+        color: var(--text-dim); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s;
+    }
+    .btn-icon.gear { margin-right: 8px; }
+    .btn-icon.close { border-color: var(--accent); color: var(--accent); background: rgba(220,70,70,0.1); }
+
+    /* ═════════════════════════════════════════ 6. SCREENS ═════════════════════════════════════════ */
+    .screen { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; transition: opacity 0.22s ease; }
+    .screen.fading { opacity: 0; pointer-events: none; }
+    .state { display:flex; flex-direction:column; gap:10px; }
+
+    /* ════════════════════════════════ 7. SCREEN 0 — CONNECTION KEY ════════════════════════════════ */
+    .key-input-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .key-input-label { font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); font-family: var(--font-mono); }
+    .key-input-field {
+        width: 100%; background: rgba(12,18,30,0.7); border: 1px solid var(--border);
+        border-radius: 6px; padding: 8px 12px; font-family: var(--font-mono);
+        font-size: 13px; color: var(--text-main); outline: none; letter-spacing: 2px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .key-input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+    .key-confirm-btn {
+        display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%;
+        padding: 9px 12px; border: 1px solid var(--accent); border-radius: 6px;
+        background: rgba(220,70,70,0.08); color: var(--accent);
+        font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+        letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.22s;
+    }
+
+    /* ════════════════════════ 8. SCREEN 1 · STATE 0 — BLUETOOTH CONNECTION ════════════════════════ */
+
+    /* ── Status ── */
+    .ble-status-row { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .dot-disconnected { width: 6px; height: 6px; border-radius: 50%; background: rgba(200,100,100,0.35); flex-shrink: 0; }
+    .ble-status-text { font-size: 9px; font-family: var(--font-mono); color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+
+    /* ── Scan and key buttons ── */
+    .ble-btn {
+        display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+        padding: 11px; border: 1px solid rgba(220,80,80,0.38); border-radius: 7px;
+        background: rgba(220,70,70,0.06); color: var(--text-main);
+        font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: all 0.25s;
+    }
+    .ble-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .ble-action-row { display: flex; gap: 6px; align-items: stretch; }
+    .ble-action-row .ble-btn { flex: 1; }
+    .btn-key {
+        flex-shrink: 0; width: 42px;
+        border: 1px solid rgba(220,80,80,0.35); border-radius: 7px;
+        background: rgba(220,70,70,0.06); color: var(--text-dim);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.22s;
+    }
+    .btn-key.glow { border-color: var(--accent); color: var(--accent); background: rgba(220,70,70,0.12); }
+
+    /* ── Devices found ── */
+    .ble-device-item {
+        display: flex; align-items: center; gap: 8px;
+        background: rgba(14,20,32,0.55); border: 1px solid rgba(180,70,70,0.18);
+        border-radius: 6px; padding: 7px 10px; cursor: pointer;
+        transition: all 0.18s;
+        animation: slide-in 0.2s ease both;
+    }
+    .ble-device-item:hover { border-color: rgba(220,80,80,0.4); background: rgba(220,70,70,0.08); }
+    .ble-device-icon { color: var(--accent); flex-shrink: 0; }
+    .ble-device-icon svg { width: 13px; height: 13px; }
+    .ble-device-info { flex: 1; min-width: 0; }
+    .ble-device-name { font-size: 11px; font-weight: 600; color: var(--text-main); }
+    .ble-device-addr { font-size: 8px; font-family: var(--font-mono); color: var(--text-dim); letter-spacing: 0.8px; }
+    .ble-device-rssi { font-size: 8px; font-family: var(--font-mono); color: var(--text-dim); flex-shrink: 0; white-space: nowrap; }
+
+    /* ── Reconnect banner ── */
+    .reconnect-banner {
+        display: flex; flex-direction: column; gap: 8px;
+        background: rgba(14, 20, 32, 0.7);
+        border: 1px solid rgba(200, 70, 70, 0.28);
+        border-radius: 8px; padding: 10px 12px;
+        animation: fade-up 0.2s ease;
+    }
+    .reconnect-banner-text {
+        font-size: 11px; font-family: var(--font-mono);
+        color: var(--text-dim); letter-spacing: 0.8px; line-height: 1.6;
+    }
+    .reconnect-banner-text span {
+        color: var(--amber); letter-spacing: 1.5px;
+    }
+    .reconnect-banner-actions { display: flex; gap: 6px; }
+    .reconnect-btn {
+        flex: 1; padding: 7px; border-radius: 6px;
+        font-family: var(--font-mono); font-size: 11px;
+        letter-spacing: 1.5px; text-transform: uppercase;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .reconnect-btn.yes {
+        border: 1px solid rgba(78, 203, 130, 0.35);
+        background: rgba(78, 203, 130, 0.07); color: var(--green);
+    }
+    .reconnect-btn.yes:hover { border-color: var(--green); background: rgba(78, 203, 130, 0.14); box-shadow: 0 0 10px var(--green-glow); }
+    .reconnect-btn.no {
+        border: 1px solid rgba(200, 70, 70, 0.28);
+        background: rgba(220, 70, 70, 0.06); color: var(--accent);
+    }
+    .reconnect-btn.no:hover { border-color: var(--accent); background: rgba(220, 70, 70, 0.12); }
+
+    /* ════════════════════════ 9. SCREEN 1 · STATE 1 — CONNECTED TELESCOPE ═════════════════════════ */
+
+    /* ── Status strip ── */
+    .status-strip {
+        background: var(--bg-strip); border-bottom: 1px solid var(--border);
+        padding: 7px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px;
+        margin: -12px -14px 2px;
+    }
+    .stat-item { display: flex; align-items: baseline; gap: 5px; }
+    .stat-label { font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); font-family: var(--font-mono); flex-shrink: 0; }
+    .stat-value { font-size: 11px; font-family: var(--font-mono); color: var(--text-mono); }
+    .stat-value.bat { color: var(--green); }
+    .stat-model { grid-column: 1/-1; display: flex; align-items: center; gap: 6px; padding-bottom: 4px; border-bottom: 1px solid rgba(160,60,60,0.2); margin-bottom: 2px; }
+    .dot-connected { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green-glow); flex-shrink: 0; animation: pulse-green 2s ease-in-out infinite; }
+
+    .model-name { font-size: 10px; font-family: var(--font-mono); color: var(--amber); letter-spacing: 1px; }
+    .bat-visual { width: 22px; height: 10px; border: 1px solid rgba(78,203,130,0.45); border-radius: 2px; position: relative; display: flex; align-items: center; padding: 1px; }
+    .bat-visual::after { content:''; position:absolute; right:-4px; top:50%; transform:translateY(-50%); width:3px; height:5px; background:rgba(78,203,130,0.45); border-radius:0 1px 1px 0; }
+    .bat-fill { height:100%; border-radius:1px; background:var(--green); box-shadow:0 0 4px var(--green-glow); }
+
+    /* ── Calibration banner ── */
+    .calib-banner { display:flex; align-items:center; justify-content:space-between; background:rgba(232,153,74,0.07); border:1px solid rgba(232,153,74,0.28); border-radius:7px; padding:7px 10px; gap:8px; }
+    .calib-banner.calibrated { background:rgba(78,203,130,0.07); border-color:rgba(78,203,130,0.28); }
+    .calib-banner-left { display:flex; align-items:center; gap:8px; color:var(--amber); }
+    .calib-banner.calibrated .calib-banner-left { color:var(--green); }
+    .calib-banner-title { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--amber); }
+    .calib-banner.calibrated .calib-banner-title { color:var(--green); }
+    .calib-banner-sub { font-size:8px; font-family:var(--font-mono); color:var(--text-dim); letter-spacing:.5px; margin-top:1px; }
+    .calib-count { font-size:9px; font-family:var(--font-mono); color:var(--amber); background:rgba(232,153,74,0.1); border:1px solid rgba(232,153,74,0.22); border-radius:8px; padding:2px 7px; white-space:nowrap; flex-shrink:0; }
+    .calib-banner.calibrated .calib-count { color:var(--green); background:rgba(78,203,130,0.1); border-color:rgba(78,203,130,0.22); }
+
+    /* ── Action buttons ── */
+    .queue-footer { display:flex; flex-direction: column; gap:5px; margin:4px 0; }
+    .q-footer-btn {
+        flex:1; display:flex; align-items:center; justify-content:center; gap:5px;
+        padding:5px 8px; border-radius:5px; border:1px solid rgba(200,70,70,0.2);
+        background:none; color:var(--text-dim); font-family:var(--font-mono);
+        font-size:8px; letter-spacing:1.2px; text-transform:uppercase;
+        cursor:pointer; transition:all 0.2s;
+    }
+    .q-footer-btn.calib {
+        border-color:rgba(78, 130, 203, 0.35); color:var(--blue);
+        animation: fade-up .2s ease;
+    }
+    .q-footer-btn.calib.glow { border-color: var(--blue); color: var(--blue); background: rgba(78, 130, 203, 0.07); box-shadow: 0 0 10px var(--blue-glow); }
+    .q-footer-btn.calib-confirm {
+        border-color:rgba(232, 153, 74, 0.35); color:var(--amber);
+        animation: fade-up .2s ease;
+    }
+    .q-footer-btn.calib-confirm.glow { border-color: var(--amber); color: var(--amber); background: rgba(232, 153, 74, 0.07); box-shadow: 0 0 10px rgba(232, 153, 74, 0.35); }
+    .q-footer-btn.from-app {
+        border-color:rgba(78,203,130,0.28); color:rgba(78,203,130,0.65);
+        animation: fade-up .2s ease;
+    }
+    .q-footer-btn.from-app.glow { border-color:var(--green); color:var(--green); background:rgba(78,203,130,0.07); box-shadow:0 0 10px var(--green-glow); }
+    .q-footer-btn.horizons {
+        border-color:rgba(200,70,70,0.22); color:rgba(180,148,148,1);
+        animation: fade-up .2s ease;
+    }
+    .q-footer-btn.horizons.glow { border-color:var(--accent); color:var(--accent); background:rgba(220,70,70,0.07); }
+
+    /* ── Calibration countdown ── */
+    .calib-countdown {
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        gap:4px; padding:8px 0 10px;
+    }
+    .calib-countdown.hidden { display:none; }
+    .cc-number {
+        font-family: var(--font-mono);
+        font-size: 40px;
+        line-height: 1;
+        color: var(--accent);
+        text-shadow: 0 0 4px var(--accent-glow), 0 0 20px var(--accent-glow);
+        animation: cc-pop 0.4s ease;
+    }
+    .cc-number .material-symbols-outlined {
+        font-size: 28px;
+        vertical-align: middle;
+    }
+    .calib-countdown.done .cc-number {
+        color: var(--green);
+        text-shadow: 0 0 4px var(--green-glow), 0 0 20px var(--green-glow);
+    }
+    .cc-label {
+        font-size:9px; color:var(--text-dim); font-family:var(--font-mono);
+        letter-spacing:1.5px; text-transform:uppercase;
+    }
+    .calib-countdown.done .cc-label { color: var(--green); }
+    .cc-dots {
+        display:inline-block; width:16px; text-align:left;
+        animation: cc-dots-blink 1s steps(3,end) infinite;
+    }
+
+    /* ── Selection placeholder ── */
+    .no-selection { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:3px 0; text-align:center; color:rgba(200,100,100,0.2); }
+    .no-selection-text { font-size:9px; color:var(--text-dim); font-family:var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; }
+    .no-selection-sub { font-size:8px; color:rgba(180,148,148,0.35); font-family:var(--font-mono); }
+
+    /* ── Object card ── */
+    .obj-type-badge {
+        display:inline-flex; align-items:center; gap:4px; font-family:var(--font-mono); width:fit-content;
+        border-radius:3px; padding:2px 6px; font-size:8px; letter-spacing:1.5px; text-transform:uppercase;
+        background:rgba(220,70,70,0.1); border:1px solid rgba(220,70,70,0.25); color:var(--accent);
+    }
+    .obj-type-badge.calib-pt {
+        background:rgba(78,203,130,0.1); border:1px solid var(--green-glow); color:var(--green);
+    }
+
+    .obj-card {
+        background: rgba(35,18,18,0.45); border: 1px solid rgba(200,80,80,0.2); border-radius: 7px; padding: 9px 11px;
+        display: flex; flex-direction: column; gap: 4px; position: relative; overflow: hidden; margin-bottom: 8px;
+        animation: fade-up .35s ease;
+    }
+    .obj-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(to bottom, var(--accent), transparent); border-radius:7px 0 0 7px; }
+    .obj-name { font-size: 15px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; }
+    .obj-name-sub { font-size: 9px; color: var(--text-dim); font-family: var(--font-mono); letter-spacing: 1px; }
+
+    /* ── Observation list ── */
+    .queue-count { font-size:8px; font-family:var(--font-mono); background:rgba(220,70,70,0.12); border:1px solid rgba(220,70,70,0.25); border-radius:8px; padding:1px 6px; color:var(--accent); }
+    .queue-item { display:flex; align-items:center; gap:7px; background:rgba(14,20,32,0.55); border:1px solid rgba(180,70,70,0.18); border-radius:6px; padding:6px 8px; transition:border-color 0.2s; }
+    .queue-item.glow { border-color:var(--accent-glow); box-shadow:0 0 12px var(--accent-glow); }
+    .queue-item.disabled { background: rgba(40, 45, 55, 0.4); color:rgba(180,148,148,0.18); cursor:not-allowed; }
+    .queue-item.focused { border-color:rgba(78,203,130,0.28); background:rgba(78,203,130,0.04); }
+    .queue-item.focused.glow { border-color:var(--green-glow); background:rgba(95,215,145,0.08); box-shadow:0 0 12px var(--green-glow); }
+    .q-info { flex:1; min-width:0; }
+    .q-name { display:flex; align-items:center; font-size:12px; font-weight:600; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .q-name.focused { color:var(--green); }
+    .q-name.disabled { color:var(--text-dim); }
+    .q-type { font-size:8px; color:var(--text-dim); font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; }
+    .q-actions { display:flex; gap:4px; flex-shrink:0; }
+    .q-btn { width:24px; height:24px; border-radius:4px; border:1px solid transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; background:none; }
+    .q-btn.track { border-color:rgba(220,80,80,0.3); color:var(--accent); }
+    .q-btn.track:hover { background:rgba(220,80,80,0.12); box-shadow:0 0 8px var(--accent-glow); }
+    .q-btn.track.on { border-color:rgba(78,203,130,0.5); background:rgba(78,203,130,0.12); color:var(--green); }
+    .q-btn.del { border-color:rgba(220,70,70,0.25); color:rgba(220,70,70,0.5); background:rgba(14,20,32,0.55); }
+    .q-btn.del.glow { background:rgba(220,70,70,0.1); border-color:rgba(220,70,70,0.5); color:var(--accent); }
+
+    /* ══════════════════════════════════ 10. SCREEN 2 — SETTINGS ═══════════════════════════════════ */
+
+    /* ── Sections and inputs ── */
+    .settings-section { display:flex; flex-direction:column; gap:8px; }
+    .settings-section-label { font-size:8px; letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); font-family:var(--font-mono); padding-bottom:5px; border-bottom:1px solid rgba(160,60,60,0.2); }
+
+    .input-row { display:flex; align-items:center; gap:8px; }
+    .input-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-dim); font-family:var(--font-mono); white-space:nowrap; flex:1; }
+    .input-field { background:rgba(12,18,30,0.7); border:1px solid var(--border); border-radius:5px; padding:5px 9px; font-family:var(--font-mono); font-size:12px; color:var(--text-main); outline:none; transition:border-color 0.2s, box-shadow 0.2s; text-align:right; width:62px; }
+    .input-field:focus { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); }
+    .input-unit { font-size:9px; color:var(--text-dim); font-family:var(--font-mono); }
+
+    /* ── Toggle ── */
+    .toggle-row { display:flex; align-items:center; gap:10px; padding:2px 0; }
+    .toggle-info { flex:1; }
+    .toggle-label { font-size:10px; font-weight:600; color:var(--text-main); }
+    .toggle-sub { font-size:8px; color:var(--text-dim); font-family:var(--font-mono); letter-spacing:0.5px; margin-top:1px; }
+    .toggle-switch { position:relative; width:34px; height:18px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-track { position:absolute; inset:0; border-radius:9px; cursor:pointer; background:rgba(20,14,14,0.8); border:1px solid rgba(200,70,70,0.28); transition:all 0.25s; }
+    .toggle-track::after { content:''; position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:rgba(200,100,100,0.4); transition:all 0.25s; }
+    .toggle-switch input:checked + .toggle-track { background:rgba(220,70,70,0.2); border-color:var(--accent); }
+    .toggle-switch input:checked + .toggle-track::after { transform:translateX(16px); background:var(--accent); box-shadow:0 0 6px var(--accent-glow); }
+
+    /* ── Barlow options ── */
+    .barlow-opts { display:flex; gap:6px; max-height:0; opacity:0; overflow:hidden; transition:max-height 0.28s ease, opacity 0.28s ease, margin-top 0.28s ease; margin-top:0; }
+    .barlow-opts.visible { max-height:40px; opacity:1; margin-top:4px; }
+    .barlow-opt { position:relative; flex:1; }
+    .barlow-opt input { position:absolute; opacity:0; width:0; height:0; }
+    .barlow-opt label { display:flex; align-items:center; justify-content:center; padding:6px 0; border-radius:5px; border:1px solid rgba(200,70,70,0.25); background:rgba(14,20,32,0.6); font-size:10px; font-family:var(--font-mono); color:var(--text-dim); cursor:pointer; transition:all 0.18s; letter-spacing:1px; user-select:none; }
+    .barlow-opt input:checked + label { border-color:var(--accent); background:rgba(220,70,70,0.14); color:var(--accent); box-shadow:0 0 8px var(--accent-glow); }
+    .barlow-opt label:hover { border-color:rgba(220,70,70,0.45); color:var(--text-main); }
+
+    /* ════════════════════════════════ 11. SCREEN 3 — JPL HORIZONS ═════════════════════════════════ */
+
+    /* ── Search ── */
+    .hz-search-row { display:flex; gap:5px; }
+    .hz-input {
+        flex:1; background:rgba(12,18,30,0.8); border:1px solid var(--border);
+        border-radius:6px; padding:7px 10px; font-family:var(--font-mono);
+        font-size:11px; color:var(--text-main); outline:none;
+        transition:border-color .2s, box-shadow .2s;
+    }
+    .hz-input::placeholder { color:rgba(180,148,148,0.3); }
+    .hz-input:focus { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); }
+
+    .hz-search-btn {
+        width:32px; height:32px; flex-shrink:0; border-radius:6px;
+        border:1px solid var(--accent); background:rgba(220,70,70,0.08);
+        color:var(--accent); cursor:pointer; display:flex; align-items:center;
+        justify-content:center; transition:all .2s;
+    }
+    .hz-search-btn:hover { background:rgba(220,70,70,0.18); box-shadow:0 0 12px var(--accent-glow); }
+    .hz-search-btn:disabled { opacity:.4; cursor:not-allowed; box-shadow:none; }
+
+    /* ── Results ── */
+    .hz-results-wrap { display:flex; flex-direction:column; gap:5px; animation:fade-up .2s ease; }
+    .hz-results-count { font-size:8px; font-family:var(--font-mono); background:rgba(220,70,70,0.1); margin-left: auto; margin-right: 6px; border:1px solid rgba(220,70,70,0.2); border-radius:8px; padding:1px 6px; color:var(--accent); }
+    .hz-item {
+        display:flex; align-items:center; gap:7px;
+        background:rgba(14,20,32,0.5); border:1px solid rgba(180,70,70,0.15);
+        border-radius:6px; padding:6px 9px; cursor:pointer;
+        transition:border-color .18s, background .18s;
+        animation:slide-in .18s ease both;
+    }
+    .hz-item:hover { border-color:rgba(220,70,70,0.35); background:rgba(220,70,70,0.06); }
+    .hz-item.checked { border-color:rgba(220,70,70,0.4); background:rgba(220,70,70,0.08); }
+    .hz-item-info { flex:1; min-width:0; }
+    .hz-item-name { font-size:10px; font-weight:600; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .hz-item-meta { font-size:7.5px; font-family:var(--font-mono); color:var(--text-dim); letter-spacing:.5px; margin-top:1px; }
+    .hz-add-btn {
+        display:flex; align-items:center; justify-content:center; gap:6px; width:100%;
+        padding:7px 12px; border:1px solid var(--accent); border-radius:6px;
+        background:rgba(220,70,70,0.07); color:var(--accent);
+        font-family:var(--font-ui); font-size:10px; font-weight:700;
+        letter-spacing:1.8px; text-transform:uppercase; cursor:pointer; transition:all .22s;
+    }
+    .hz-add-btn.glow { background:rgba(220,70,70,0.16); box-shadow:0 0 12px var(--accent-glow); }
+    .hz-add-btn:disabled { opacity:.35; cursor:not-allowed; box-shadow:none; }
+    .hz-add-badge { background:rgba(220,70,70,0.18); border-radius:8px; padding:1px 6px; font-size:9px; }
+    .hz-empty { font-size:9px; font-family:var(--font-mono); color:var(--text-dim); text-align:center; padding:12px 0; letter-spacing:1px; }
+
+    /* ════════════════════════════════ 12. FORMER VERSION (UNUSED) ═════════════════════════════════ */
+    /* calibrate action button
+    .calib-btn { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:4px 10px; border:1px solid var(--amber); border-radius:6px; background:rgba(232,153,74,0.07); color:var(--amber); font-family:var(--font-ui); font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.25s; }
+    .calib-btn.glow { background:rgba(232,153,74,0.16); box-shadow:0 0 16px rgba(232,153,74,0.28); }
+    .calib-btn:disabled { opacity:0.45; cursor:default; box-shadow:none; }
+
+    /* track action button
+    .track-btn { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:8px 12px; border:1px solid var(--accent); border-radius:6px; background:rgba(220,70,70,0.07); color:var(--accent); font-family:var(--font-ui); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.25s; }
+    .track-btn:hover { background:rgba(220,70,70,0.16); box-shadow:0 0 16px var(--accent-glow); }
+    .track-btn.active { border-color:var(--green); background:rgba(78,203,130,0.1); color:var(--green); box-shadow:0 0 16px var(--green-glow); animation:track-pulse 3s ease-in-out infinite; }
+
+    /* push-to action button
+    .pushto-btn { display:flex; align-items:center; justify-content:center; gap:7px; flex:1; padding:8px 10px; border:1px solid rgba(180,148,148,0.28); border-radius:6px; background:rgba(180,148,148,0.04); color:var(--text-dim); font-family:var(--font-ui); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.25s; }
+    .pushto-btn:hover { background:rgba(180,148,148,0.1); border-color:var(--text-main); color:var(--text-main); }
+    .pushto-btn svg { width:13px; height:13px; }
+
+    /* action row (track + pushto)
+    .action-row { display:flex; gap:6px; }
+    .action-row .track-btn { flex:1; }
+
+    /* mini calibrate action button (calibrate for stars)
+    .calib-mini-btn { display:flex; align-items:center; justify-content:center; gap:5px; width:100%; padding:5px; background:none; border:1px solid rgba(232,153,74,0.18); border-radius:5px; color:rgba(232,153,74,0.5); font-size:8px; font-family:var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+    .calib-mini-btn:hover { border-color:var(--amber); color:var(--amber); background:rgba(232,153,74,0.07); }
+    .calib-mini-btn:disabled { opacity:0.35; cursor:default; }
+    .calib-mini-btn svg { width:9px; height:9px; } */
+
+    /* ═══════════════════════════════ 13. UTILITIES — MUST STAY LAST ═══════════════════════════════ */
+    .hidden { display: none; animation: none; }
+
+</style>
+</head>
+
+<body>
+<!-- ═══════════════════════════════════════ FLOATING BUTTON ═══════════════════════════════════════ -->
+<!-- Shown while the menu is closed: a tap opens the menu. Its image is set by android_init(). -->
+<img id="icon_bubble" onclick="openMenu()" />
+
+<!-- ═════════════════════════════════════════ MENU PANEL ══════════════════════════════════════════ -->
+<div class="panel" id="menu" style="display: none">
+    <!-- ───────────────────────────────────────── HEADER ────────────────────────────────────────── -->
+    <!-- Title, settings button and close button -->
+    <div class="header">
+        <span class="material-symbols-outlined header-icon" style="font-size:27px;">cell_tower</span>
+        <div class="header-titles">
+            <div class="header-title">DOBSON GOTO</div>
+            <div class="header-sub">TELESCOPE CONTROL</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-icon gear hidden" id="btn-settings" onclick="toggleSettings()">
+                <span class="material-symbols-outlined" style="font-size:16px;">settings</span>
+            </button>
+            <button class="btn-icon close" onclick="this.style.opacity='0.4';setTimeout(()=>{this.style.opacity='';closeMenu()},300)">
+                <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ────────────────────────────────────────── BODY ─────────────────────────────────────────── -->
+    <!-- Only one screen is visible at a time (see toggleScreenTransition) -->
+    <div class="panel-body">
+
+        <!-- ══════════════════════════════ SCREEN 0 — CONNECTION KEY ══════════════════════════════ -->
+        <!-- Key used to authenticate with the telescope: asked at the first launch, or with the key button of screen 1. -->
+        <div class="screen hidden" id="screen-0">
+            <div class="settings-topbar">
+                <button class="back-btn" onclick="Android.requestFocus(false);toggleScreenTransition('screen-1', 'screen-0');">
+                    <span class="material-symbols-outlined" style="font-size:15px;">arrow_back_ios_new</span>
+                    RETOUR
+                </button>
+                <span class="settings-page-title">CLÉ DE CONNEXION</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="key-input-wrap">
+                <div class="key-input-label">Entrez votre clé Bluetooth</div>
+                <input class="key-input-field" type="password" id="key-input" placeholder="Clé de connexion" autocomplete="off">
+            </div>
+
+            <button class="key-confirm-btn" onclick="Android.editBTKey(document.querySelector('#key-input').value)">
+                <span class="material-symbols-outlined" style="font-size:15px;">check</span>
+                CONFIRMER
+            </button>
+        </div><!-- /screen-0 -->
+
+        <!-- ═══════════════════════════════════ SCREEN 1 — MAIN ═══════════════════════════════════ -->
+        <!-- Bluetooth connection (state 0), then connected telescope (state 1). -->
+        <div class="screen" id="screen-1">
+            <!-- ───────────────────────── STATE 0 — BLUETOOTH CONNECTION ────────────────────────── -->
+            <div class="state" id="state-0">
+                <div class="ble-status-row">
+                    <div class="dot-disconnected"></div>
+                    <div class="ble-status-text">TÉLESCOPE NON CONNECTÉ</div>
+                </div>
+
+                <!-- Error banner -->
+                <div class="error-banner hidden" id="ble-error">
+                    <span class="material-symbols-outlined error-banner-icon" style="font-size:18px;">running_with_errors</span>
+                    <div class="error-banner-text">Erreur inconnue</div>
+                </div>
+
+                <!-- Scan and connection key buttons -->
+                <div class="ble-action-row">
+                    <button class="ble-btn" id="ble-connect-btn" onclick="Android.toggleScan(false)">
+                        <span class="material-symbols-outlined" style="font-size:18px;">bluetooth_searching</span>
+                        <span id="scan-text-btn">Connecter via Bluetooth</span>
+                    </button>
+                    <button class="btn-key" id="btn-key" title="Clé de connexion" onclick="this.classList.add('glow');setTimeout(()=>{this.classList.remove('glow');toggleScreenTransition('screen-0', 'screen-1');Android.requestFocus(true);},300)">
+                        <span class="material-symbols-outlined" style="font-size:18px;">key</span>
+                    </button>
+                </div>
+
+                <!-- Reconnect banner: offers to reconnect to the telescope of the previous session -->
+                <div class="reconnect-banner hidden" id="reconnect-banner">
+                    <div class="reconnect-banner-text">
+                        Une session existe déjà avec <span id="reconnect-addr">?</span><br>Voulez-vous vous reconnecter ?
+                    </div>
+                    <div class="reconnect-banner-actions">
+                        <button class="reconnect-btn no"  onclick="Android.toggleScan(true)">✕ &nbsp;NON</button>
+                        <button class="reconnect-btn yes" onclick="Android.connectToActiveSession()">✓ &nbsp;OUI</button>
+                    </div>
+                </div>
+
+                <!-- Scan in progress -->
+                <div class="ble-status-row hidden" id="scan-status">
+                    <div class="dot-disconnected" style="background:var(--amber);box-shadow:0 0 6px rgba(232,153,74,0.4);animation:scan-blink 0.9s step-end infinite;"></div>
+                    <div class="ble-status-text">RECHERCHE EN COURS…</div>
+                </div>
+
+                <!-- Devices found, added by android_addBtDevice() -->
+                <div class="list-header hidden" id="ble-list-header">
+                    <span class="list-title">APPAREILS TROUVÉS</span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <button class="nav-arrow" id="ble-up" onclick="scrollList('ble-list','ble-up','ble-down',-1)" disabled>
+                            <span class="material-symbols-outlined" style="font-size:15px;">arrow_drop_up</span>
+                        </button>
+                        <button class="nav-arrow" id="ble-down" onclick="scrollList('ble-list','ble-up','ble-down',1)" disabled>
+                            <span class="material-symbols-outlined" style="font-size:15px;">arrow_drop_down</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="list hidden" style="max-height:130px" id="ble-list"></div>
+            </div><!-- /state-0 -->
+
+            <!-- ────────────────────────── STATE 1 — CONNECTED TELESCOPE ────────────────────────── -->
+            <div class="state hidden" id="state-1">
+                <!-- Status strip: model, position, battery and temperature -->
+                <div class="status-strip">
+                    <div class="stat-item stat-model">
+                        <div class="dot-connected"></div>
+                        <span id="model-name" class="model-name"></span>
+                        <div class="ble-status-text" style="color:rgba(78,203,130,0.75);margin-left: auto">— CONNECTÉ</div>
+                    </div>
+                    <div class="stat-item"><span class="stat-label">AZ</span><span class="stat-value">--°</span></div>
+                    <div class="stat-item"><span class="stat-label">ALT</span><span class="stat-value">--°</span></div>
+                    <div class="stat-item" style="align-items:center;gap:5px;">
+                        <span class="stat-label">BAT</span>
+                        <div class="bat-visual"><div id="battery-level-style" class="bat-fill" style="width:0"></div></div>
+                        <span id="bat-level" class="stat-value bat">--%</span>
+                    </div>
+                    <div class="stat-item"><span class="stat-label">TEMP</span><span class="stat-value">--°C</span></div>
+                </div>
+
+                <!-- Calibration banner: number of reference stars -->
+                <div class="calib-banner" id="calib-banner">
+                    <div class="calib-banner-left">
+                        <span class="material-symbols-outlined" style="font-size:25px;">stars_2</span>
+                        <div>
+                            <div class="calib-banner-title">NON CALIBRÉ</div>
+                            <div class="calib-banner-sub" id="calib-sub">Pointez au moins 3 étoiles pour calibrer</div>
+                        </div>
+                    </div>
+                    <span class="calib-count" id="calib-count">0 ★</span>
+                </div>
+
+                <!-- Action buttons, shown by the Java code according to the selection and the calibration -->
+                <div class="queue-footer hidden" id="add-queue-footer">
+                    <button class="q-footer-btn calib-confirm hidden" id="btn-confirm-calib" onclick="this.classList.add('glow');setTimeout(()=>{this.classList.remove('glow');Android.confirmCalibrationComplete();},300)">
+                        <span class="material-symbols-outlined" style="font-size:15px;">verified</span>
+                        <span>Enregistrer la calibration</span>
+                    </button>
+                    <button class="q-footer-btn calib hidden" id="btn-add-calib" onclick="this.classList.add('glow');setTimeout(()=>{this.classList.remove('glow');Android.calibratePoint();},300)">
+                        <span class="material-symbols-outlined" style="font-size:15px;">adjust</span>
+                        <span id="add-calib-text"></span>
+                    </button>
+                    <button class="q-footer-btn horizons hidden" id="btn-add-horizons" onclick="this.classList.add('glow');setTimeout(()=>{this.classList.remove('glow');toggleHzScreen(true);},300)">
+                        <span class="material-symbols-outlined" style="font-size:15px;">zoom_in</span>
+                        Ajouter via JPL Horizons
+                    </button>
+                    <button class="q-footer-btn from-app hidden" id="btn-add-from-app" onclick="this.classList.add('glow');setTimeout(()=>{this.classList.remove('glow');Android.addClickedObject();},300)">
+                        <span class="material-symbols-outlined" style="font-size:15px;">add</span>
+                        <span id="add-from-app-label"></span>
+                    </button>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Calibration countdown (3, 2, 1) -->
+                <div class="calib-countdown hidden" id="calib-countdown">
+                    <div class="cc-number" id="cc-number"></div>
+                    <div class="cc-label" id="cc-label"><span class="cc-dots"></span></div>
+                </div>
+
+                <!-- Selected object: placeholder when nothing is selected, otherwise the card of the object -->
+                <div class="no-selection hidden" id="no-selection-footer">
+                    <span class="material-symbols-outlined" id="no-selection-icon" style="font-size:20px;"></span>
+                    <span class="no-selection-text" id="no-selection-text"></span>
+                    <span class="no-selection-sub" id="no-selection-sub" style="font-size:10px;"></span>
+                </div>
+
+                <div class="obj-card hidden" id="obj-card">
+                    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px;">
+                        <div class="obj-type-badge">
+                            <span class="material-symbols-outlined" id="obj-type-icon" style="font-size:15px;"></span>
+                            <span id="obj-type-label"></span>
+                        </div>
+                        <span class="obj-type-badge calib-pt hidden" id="obj-calib-badge">★ CALIBRÉE</span>
+                    </div>
+                    <div class="obj-name" id="obj-name"></div>
+                    <div class="obj-name-sub" id="obj-name-sub"></div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Observation list (calibration list until the telescope is calibrated) -->
+                <div class="list-header hidden" id="obj-list-header">
+                    <span class="list-title" id="obj-list-title"></span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span class="queue-count" id="q-count">0 objet</span>
+                        <button class="nav-arrow" id="q-up" onclick="scrollList('queue-list','q-up','q-down',-1)" disabled>
+                            <span class="material-symbols-outlined" style="font-size:15px;">arrow_drop_up</span>
+                        </button>
+                        <button class="nav-arrow" id="q-down" onclick="scrollList('queue-list','q-up','q-down',1)" disabled>
+                            <span class="material-symbols-outlined" style="font-size:15px;">arrow_drop_down</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="list hidden" style="max-height:145px" id="queue-list"></div>
+            </div><!-- /state-1 -->
+        </div><!-- /screen-1 -->
+
+        <!-- ═════════════════════════════════ SCREEN 2 — SETTINGS ═════════════════════════════════ -->
+        <!-- Optical settings: eyepiece focal length and Barlow lens. -->
+        <div class="screen hidden" id="screen-2">
+            <div class="settings-topbar">
+                <button class="back-btn" onclick="toggleSettings()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    RETOUR
+                </button>
+                <span class="settings-page-title">PARAMÈTRES</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="settings-section">
+                <div class="settings-section-label">Optique</div>
+
+                <div class="input-row">
+                    <span class="input-label">Focale oculaire</span>
+                    <input class="input-field" type="number" value="25" min="1" max="200">
+                    <span class="input-unit">mm</span>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="toggle-label">Barlow</div>
+                        <div class="toggle-sub">Extenseur de focale</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="barlow-toggle" onchange="onBarlowChange(this)">
+                        <span class="toggle-track"></span>
+                    </label>
+                </div>
+
+                <div class="barlow-opts" id="barlow-opts">
+                    <div class="barlow-opt"><input type="radio" name="barlow" id="b2" value="2" checked><label for="b2">×2</label></div>
+                    <div class="barlow-opt"><input type="radio" name="barlow" id="b3" value="3"><label for="b3">×3</label></div>
+                    <div class="barlow-opt"><input type="radio" name="barlow" id="b5" value="5"><label for="b5">×5</label></div>
+                </div>
+            </div>
+        </div><!-- /screen-2 -->
+
+        <!-- ═══════════════════════════════ SCREEN 3 — JPL HORIZONS ═══════════════════════════════ -->
+        <!-- Search of solar system objects in the NASA JPL Horizons database, then addition to the list. -->
+        <div class="screen hidden" id="screen-3">
+            <div class="settings-topbar">
+                <button class="back-btn" onclick="toggleHzScreen(false)">
+                    <span class="material-symbols-outlined" style="font-size:15px;">arrow_back_ios_new</span>
+                    RETOUR
+                </button>
+                <span class="settings-page-title">JPL HORIZONS</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Search field -->
+            <div class="hz-search-row">
+                <input class="hz-input" id="hz-input" type="text" placeholder="Nom, désignation, code…" autocomplete="off" onkeydown="if(event.key==='Enter') Android.searchHorizons(document.querySelector('#hz-input').value);">
+                <button class="hz-search-btn" id="hz-search-btn" onclick="Android.searchHorizons(document.querySelector('#hz-input').value);" title="Rechercher">
+                    <span class="material-symbols-outlined" style="font-size:18px;">database_search</span>
+                </button>
+            </div>
+
+            <!-- Error banner -->
+            <div class="error-banner hidden" id="hz-error">
+                <span class="material-symbols-outlined error-banner-icon" style="font-size:18px;">running_with_errors</span>
+                <div class="error-banner-text">Erreur inconnue</div>
+            </div>
+
+            <!-- Loader, shown while Horizons answers -->
+            <div class="dobgo-loader hidden" id="hz-loader">
+                <div class="dobgo-spinner"></div>
+                <span class="dobgo-loader-text">Interrogation Horizons…</span>
+            </div>
+
+            <!-- Results, added by android_onHzResult() -->
+            <div class="hz-results-wrap hidden" id="hz-results-wrap">
+                <div class="list-header">
+                    <span class="list-title">RÉSULTATS</span>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span class="hz-results-count" id="hz-results-count">0</span>
+                        <button class="nav-arrow" id="hz-up" onclick="scrollList('hz-list','hz-up','hz-down',-1)" disabled>
+                            <span class="material-symbols-outlined" style="font-size:15px;">arrow_drop_up</span>
+                        </button>
+                        <button class="nav-arrow" id="hz-down" onclick="scrollList('hz-list','hz-up','hz-down',1)" disabled>
+                            <span class="material-symbols-outlined" style="font-size:15px;">arrow_drop_down</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="list" style="max-height:220px" id="hz-list"></div>
+
+                <button class="hz-add-btn" id="hz-add-btn" onclick="this.classList.add('glow');setTimeout(()=>{this.classList.remove('glow');Android.addHorizonsToQueue(JSON.stringify([...hzCheckedItems]));},300)" disabled>
+                    <span class="material-symbols-outlined" style="font-size:15px;">add</span>
+                    Ajouter à la liste
+                    <span class="hz-add-badge" id="hz-add-badge">0</span>
+                </button>
+            </div>
+        </div><!-- /screen-3 -->
+
+    </div><!-- /panel-body -->
+</div><!-- /menu -->
+
+<script>
+    // ════════════════════════════════════ 0. BROWSER FALLBACK ═════════════════════════════════════ //
+    // In a desktop browser, the Android bridge does not exist: these empty functions replace it,
+    // so that the menu can be opened and tested outside the app.
+    if (typeof window.Android === 'undefined') {
+        window.Android = {
+            resize: () => {},
+            toggleScan: (variable) => {},
+            closeScan: () => {},
+            connectToActiveSession: () => {},
+            connectToServer: (variable) => {},
+            calibratePoint: () => {},
+            confirmCalibrationComplete: () => {},
+            editBTKey: (variable) => {},
+            addClickedObject: () => {},
+            deleteObject: (variable, variable2) => {},
+            toggleObjectCard: (variable, variable2) => {},
+            updateCalibPoint: (variable, variable2) => {},
+            addHorizonsToQueue: (variable) => {},
+            searchHorizons: (variable) => {},
+            requestFocus: (variable) => {},
+            showToast: (variable) => {},
+            logkat: (variable, variable2) => {},
+        };
+    }
+
+    // ══════════════════════════════════ 1. SHARED DOM REFERENCES ══════════════════════════════════ //
+    const fb = document.querySelector("#icon_bubble");
+    const menu = document.querySelector("#menu");
+    const screen_0 = document.querySelector("#screen-0");
+    const screen_1 = document.querySelector("#screen-1");
+    const screen_3 = document.querySelector("#screen-3");
+    const state_0 = document.querySelector("#state-0");
+    const state_1 = document.querySelector("#state-1");
+    const btn_settings = document.querySelector("#btn-settings");
+
+    // ════════════════════════════════════════ 2. UTILITIES ════════════════════════════════════════ //
+
+    // ── Size of the window ── //
+    /**
+     * Tells the Java code the size of the visible content, so that the overlay window fits it exactly:
+     * <ul>
+     *   <li>menu closed: size of the floating button;</li>
+     *   <li>menu open: width of the panel (CSS variable <code>--panel-w</code>) and height of the page.</li>
+     * </ul>
+     * Must be called after every change that can change the size of the menu.
+     */
+    function refreshSize() {
+        if (fb.style.display !== "none") { Android.resize(fb.width, fb.height); }
+        else if (menu.style.display !== "none") {
+            const value = getComputedStyle(document.documentElement)
+                .getPropertyValue('--panel-w')
+                .trim();
+            const width = parseInt(value, 10);
+            Android.resize(width, document.documentElement.scrollHeight)
+        }
+    }
+
+    // ── Screen transitions ── //
+    /**
+     * Replaces a screen, or a state of screen 1, by another one with a cross-fade:
+     * <ol>
+     *   <li>the children of the screen being left fade out (150 ms);</li>
+     *   <li>that screen is hidden, and the new one fades in (180 ms);</li>
+     *   <li>the size of the window is updated.</li>
+     * </ol>
+     * @param {string} show_id - id of the screen to show, e.g. <code>'screen-1'</code> or <code>'state-1'</code>
+     * @param {string} hide_id - id of the screen to hide
+     */
+    function toggleScreenTransition(show_id, hide_id) {
+        const screen_to_show = document.querySelector('#' + show_id);
+        const screen_to_hide = document.querySelector('#' + hide_id);
+
+        const children = Array.from(screen_to_hide.children);
+
+        // 1. Fade out the children of the screen being left
+        children.forEach(el => {
+            el.style.transition = 'opacity 0.15s ease';
+            el.style.opacity = '0';
+        });
+
+        setTimeout(() => {
+            // 2. Hide that screen, and reset its children for the next visit
+            screen_to_hide.classList.add('hidden');
+            children.forEach(el => {
+                el.style.transition = '';
+                el.style.opacity = '';
+            });
+
+            // 3. Show the new screen fully transparent, then fade it in
+            screen_to_show.classList.remove('hidden');
+            screen_to_show.style.opacity = '0';
+            screen_to_show.offsetHeight; // force reflow
+            screen_to_show.style.transition = 'opacity 0.18s ease';
+            screen_to_show.style.opacity = '1';
+
+            setTimeout(() => {
+                screen_to_show.style.transition = '';
+                screen_to_show.style.opacity = '';
+                refreshSize();
+            }, 180);
+
+        }, 150);
+    }
+
+    // ── Error banners ── //
+    /**
+     * Shows or hides an error banner. Called by the Java code and by the Horizons screen.
+     * @param {boolean} enable - <code>true</code> to show the banner
+     * @param {string} id - id of the banner: <code>'ble-error'</code> (Bluetooth) or <code>'hz-error'</code> (Horizons)
+     * @param {?string} msg - message to display; a default message is used if it is empty
+     */
+    function android_toggleError(enable, id, msg) {
+        const error_banner = document.querySelector("#" + id);
+        error_banner.classList.toggle('hidden', !enable);
+        error_banner.querySelector('.error-banner-text').textContent = msg || 'Erreur inconnue';
+        refreshSize();
+    }
+
+    // ── Arrow-based list navigation ── //
+    /**
+     * Scrolls a list by one item, then updates its arrows. The lists hide their overflow,
+     * so the arrows of their header are the only way to scroll them.
+     * @param {string} list_id - id of the list
+     * @param {string} up_id - id of its "up" arrow
+     * @param {string} down_id - id of its "down" arrow
+     * @param {number} dir - <code>-1</code> to scroll up, <code>1</code> to scroll down
+     */
+    function scrollList(list_id, up_id, down_id, dir) {
+        const list = document.getElementById(list_id);
+        const itemH = list.firstElementChild ? list.firstElementChild.getBoundingClientRect().height + 4 : 36;
+        list.scrollTop += dir * itemH;
+        setTimeout(() => updateNavArrows(list_id, up_id, down_id), 50);
+    }
+
+    /**
+     * Enables or disables the arrows of a list according to its scroll position:
+     * the "up" arrow is disabled at the top, the "down" arrow at the bottom (2 px tolerance).
+     * @param {string} list_id - id of the list
+     * @param {string} up_id - id of its "up" arrow
+     * @param {string} down_id - id of its "down" arrow
+     */
+    function updateNavArrows(list_id, up_id, down_id) {
+        const list = document.getElementById(list_id);
+        const up = document.getElementById(up_id);
+        const down = document.getElementById(down_id);
+        if (!list || !up || !down) return;
+        const atTop = list.scrollTop <= 2;
+        const atBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
+        up.disabled = atTop;
+        down.disabled = atBottom;
+    }
+
+    // ═════════════════════════════════ 3. FLOATING BUTTON & MENU ══════════════════════════════════ //
+
+    /**
+     * First function called by the Java code, once the page has loaded (<code>AppMenuService.onCreate</code>).
+     * Sets the image of the floating button, and shows only this button.
+     * @param {string} b64_icon - image of the floating button, as a Base64 PNG
+     * @param {boolean} first_setup - <code>true</code> if no connection key is saved yet: the menu will then open
+     *     on the key screen (screen 0), without its back button
+     */
+    function android_init(b64_icon, first_setup) {
+        fb.src = "data:image/png;base64," + b64_icon.replace(/\s/g, '');
+
+        if (first_setup) {
+            screen_0.querySelector(".back-btn").style.display = "none";
+            screen_1.classList.add("hidden");
+            screen_0.classList.remove("hidden");
+        }
+
+        fb.style.display = "block";
+        menu.style.display = "none";
+        refreshSize();
+    }
+
+    /**
+     * Opens the menu (tap on the floating button). If the visible screen has a text field
+     * (connection key or Horizons search), the menu takes the keyboard focus.
+     */
+    function openMenu() {
+        fb.style.display = "none";
+        menu.style.display = "block";
+        if (!screen_0.classList.contains("hidden")
+            || !screen_3.classList.contains("hidden")) { Android.requestFocus(true); }
+        refreshSize();
+    }
+
+    /**
+     * Closes the menu (close button of the header): the floating button comes back, the keyboard focus
+     * is given back to the host app, and a running Bluetooth scan is stopped.
+     */
+    function closeMenu() {
+        fb.style.display = "block";
+        menu.style.display = "none";
+
+        Android.requestFocus(false);
+
+        if (!state_0.classList.contains('hidden')) { Android.closeScan(); }
+        refreshSize();
+    }
+
+    // ════════════════════════ 4. SCREEN 1 · STATE 0 — BLUETOOTH CONNECTION ════════════════════════ //
+
+    // ── DOM references ── //
+    const bt_connect_btn = document.querySelector("#ble-connect-btn");
+    const btn_key = document.querySelector("#btn-key");
+    const ble_list_header = document.querySelector("#ble-list-header");
+    const ble_list = document.querySelector("#ble-list");
+    const scan_status = document.querySelector("#scan-status");
+    const reconnect_banner = document.querySelector("#reconnect-banner");
+
+    /**
+     * Updates the Bluetooth connection screen. Called by the Java code when a scan starts or stops,
+     * and when a connection starts (<code>JSInterface.toggleScan</code>, <code>closeScan</code>, <code>connectToServer</code>).
+     * @param {boolean} scanning - <code>true</code> while a scan is running: the list of devices is shown
+     * @param {boolean} scanBtnEnabled - whether the scan button can be clicked
+     * @param {string} scanBtnText - text of the scan button
+     * @param {boolean} hideList - <code>true</code> to hide and empty the list of devices
+     * @param {boolean} hideStatus - <code>true</code> to hide the "search in progress" indicator
+     * @param {boolean} hideKey - <code>true</code> to hide the connection key button
+     */
+    function android_toggleScan(scanning, scanBtnEnabled, scanBtnText, hideList, hideStatus, hideKey) {
+        bt_connect_btn.classList.toggle("scanning", scanning);
+        bt_connect_btn.disabled = !scanBtnEnabled;
+        bt_connect_btn.querySelector("#scan-text-btn").textContent = scanBtnText;
+
+        if (scanning) {
+            ble_list_header.classList.remove("hidden");
+            ble_list.classList.remove("hidden");
+        }
+        if (hideList === true) {
+            ble_list_header.classList.add("hidden");
+            ble_list.classList.add("hidden");
+            ble_list.innerHTML = '';
+        }
+
+        scan_status.classList.toggle("hidden", hideStatus);
+        btn_key.classList.toggle("hidden", hideKey);
+        refreshSize();
+    }
+
+    /**
+     * Adds a device found during the scan to the list. Called by the Java code (<code>BLEManager</code>)
+     * for each new device. A tap on the device starts the connection (<code>Android.connectToServer</code>).
+     * @param {string} name - name of the device
+     * @param {string} address - MAC address of the device
+     * @param {number} rssi - signal strength, in dBm
+     */
+    function android_addBtDevice(name, address, rssi) {
+        ble_list_header.classList.remove("hidden");
+        ble_list.classList.remove("hidden");
+
+        const item = document.createElement('div');
+        item.className = 'ble-device-item';
+        item.innerHTML = `
+          <div class="ble-device-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6.5 6.5 17.5 17.5"/><polyline points="17.5 6.5 12 12 17.5 17.5"/>
+            </svg>
+          </div>
+          <div class="ble-device-info">
+            <div class="ble-device-name">${name}</div>
+            <div class="ble-device-addr">${address}</div>
+          </div>
+          <div class="ble-device-rssi">${rssi} dBm</div>`;
+        item.onclick = () => Android.connectToServer(address);
+        ble_list.appendChild(item);
+        setTimeout(() => updateNavArrows('ble-list', 'ble-up', 'ble-down'), 50);
+        refreshSize();
+    }
+
+    /**
+     * Shows or hides the banner that offers to reconnect to the telescope of the previous session.
+     * Called by the Java code (<code>JSInterface.toggleScan</code>).
+     * @param {boolean} show - <code>true</code> to show the banner
+     * @param {string} address - MAC address of that telescope
+     */
+    function android_toggleReconnectBanner(show, address) {
+        reconnect_banner.querySelector('#reconnect-addr').textContent = address;
+        reconnect_banner.classList.toggle('hidden', !show);
+        refreshSize();
+    }
+
+    // ════════════════════════ 5. SCREEN 1 · STATE 1 — CONNECTED TELESCOPE ═════════════════════════ //
+
+    // ── State ── //
+    /** Calibration state of the telescope: until it is <code>true</code>, a tap on an object of the list does nothing. */
+    let is_calibrated = false;
+
+    /** Number of reference stars recorded for the calibration. */
+    let starNumber = 0;
+
+    // ── DOM references ── //
+    const obj_card = document.querySelector("#obj-card");
+    const add_queue_footer = document.querySelector("#add-queue-footer");
+    const btn_confirm_calib = add_queue_footer.querySelector("#btn-confirm-calib");
+    const btn_add_calib = add_queue_footer.querySelector('#btn-add-calib');
+    const btn_add_horizons = add_queue_footer.querySelector('#btn-add-horizons');
+    const btn_add_from_app = add_queue_footer.querySelector('#btn-add-from-app');
+    const calib_countdown = document.querySelector("#calib-countdown");
+    const cc_number = calib_countdown.querySelector("#cc-number");
+    const cc_label = calib_countdown.querySelector("#cc-label");
+    const no_selection_footer = document.querySelector("#no-selection-footer");
+    const no_selection_icon = no_selection_footer.querySelector("#no-selection-icon");
+    const no_selection_text = no_selection_footer.querySelector("#no-selection-text");
+    const no_selection_sub = no_selection_footer.querySelector("#no-selection-sub");
+    const obj_list_header = document.querySelector("#obj-list-header");
+    const obj_list_title = obj_list_header.querySelector("#obj-list-title");
+    const q_count = obj_list_header.querySelector("#q-count");
+    const queue_list = document.querySelector("#queue-list");
+    const battery_level_style = document.querySelector("#battery-level-style");
+    const calib_banner = document.querySelector("#calib-banner");
+    const calib_sub = document.querySelector("#calib-sub");
+    const calib_count = document.querySelector("#calib-count");
+
+    // ── Connection ── //
+    /**
+     * Displays a value of the telescope in the status strip. Called by the Java code, e.g. for the battery.
+     * For the battery (<code>'bat-level'</code>), the gauge is also filled: the value must then be a percentage,
+     * e.g. <code>'75%'</code>.
+     * @param {string} id - id of the element to update, e.g. <code>'bat-level'</code> or <code>'model-name'</code>
+     * @param {string} value - text to display
+     */
+    function android_updateScopeData(id, value) {
+        const element = document.querySelector('#' + id);
+        element.textContent = value;
+        if (element.id === "bat-level") battery_level_style.style.width = value;
+    }
+
+    /**
+     * Switches to the "connected telescope" state, once the telescope has accepted the authentication.
+     * Called by the Java code (<code>BLEManager</code>).
+     * @param {string} name - name (model) of the telescope
+     */
+    function android_connectedServer(name) {
+        toggleScreenTransition('state-1', 'state-0');
+        btn_settings.classList.remove('hidden');
+        android_updateScopeData('model-name', name);
+        refreshSize();
+    }
+
+    /**
+     * Goes back to the Bluetooth connection state after a disconnection, and hides everything that belongs
+     * to the connected state. Does nothing if the connected state is not displayed.
+     * Called by the Java code (<code>BLEManager</code>).
+     */
+    function android_disconnectedServer() {
+        if (!state_1.classList.contains('hidden')) {
+            toggleScreenTransition('state-0', 'state-1');
+            btn_settings.classList.add('hidden');
+            android_updateScopeData('model-name', '');
+
+            add_queue_footer.classList.add('hidden');
+            no_selection_footer.classList.add('hidden');
+            obj_card.classList.add('hidden');
+            obj_list_header.classList.add('hidden');
+            queue_list.classList.add('hidden');
+            calib_countdown.classList.add('hidden');
+
+            refreshSize();
+        }
+    }
+
+    // ── Calibration ── //
+    /**
+     * Updates the calibration banner and the buttons according to the number of reference stars.
+     * Called by the Java code each time the number changes. From 3 stars, the telescope is calibrated:
+     * <ul>
+     *   <li>the banner turns green, and the list becomes the observation list;</li>
+     *   <li>the "calibrate" button is replaced by the "add via JPL Horizons" button.</li>
+     * </ul>
+     * @param {number} star_nb - number of reference stars
+     */
+    function android_updateCalibrationData(star_nb) {
+        starNumber = star_nb;
+        const is_ready = starNumber >= 3;
+        calib_banner.classList.toggle('calibrated', is_ready);
+
+        btn_add_calib.classList.toggle('hidden', is_ready);
+        btn_add_horizons.classList.toggle('hidden', !is_ready);
+
+        const calib_banner_title = calib_banner.querySelector('.calib-banner-title');
+        if (is_ready) {
+            calib_banner_title.textContent = 'CALIBRÉ';
+            calib_sub.textContent = starNumber + ' étoiles de référence' + (starNumber > 3 ? " — c'est plus que nécessaire, bien joué !" : '');
+            obj_list_title.textContent = "FILE D'OBSERVATION";
+        } else {
+            calib_banner_title.textContent = 'NON CALIBRÉ';
+            calib_sub.textContent = starNumber === 0 ?
+                'Pointez au moins 3 étoiles pour calibrer'
+                : 'Calibration partielle — ' + starNumber + '/3 étoile' + (starNumber > 1 ? 's' : '') + ' de référence)';
+            obj_list_title.textContent = "FILE DE CALIBRATION";
+        }
+        calib_count.textContent = starNumber + ' ★';
+        android_refreshNoSelection();
+        refreshSize();
+    }
+
+    /**
+     * Plays the 3-2-1 countdown of the calibration on a star, then shows a check mark for 2 s,
+     * before showing the placeholder again. Called by the Java code (<code>JSInterface.calibratePoint</code>).
+     * Each number replays the <code>cc-pop</code> animation.
+     */
+    function android_playCalibCountdown() {
+        let count = 3;
+
+        add_queue_footer.classList.add('hidden');
+        obj_card.classList.add('hidden');
+
+        calib_countdown.classList.remove('hidden', 'done');
+        cc_number.innerHTML = String(count);
+        cc_label.innerHTML = 'Calibration<span class="cc-dots">...</span>';
+        refreshSize();
+
+        const tick = setInterval(() => {
+            count--;
+            if (count > 0) {
+                cc_number.textContent = '' + count;
+                // Force a reflow to replay the cc-pop animation on each number
+                cc_number.style.animation = 'none';
+                void cc_number.offsetHeight;
+                cc_number.style.animation = '';
+                refreshSize();
+            } else {
+                clearInterval(tick);
+                calib_countdown.classList.add('done');
+                cc_number.innerHTML = '<span class="material-symbols-outlined">check_circle</span>';
+                cc_label.textContent = 'Calibré !';
+                cc_number.style.animation = 'none';
+                void cc_number.offsetHeight;
+                cc_number.style.animation = '';
+
+                setTimeout(() => {
+                    calib_countdown.classList.add('hidden');
+                    calib_countdown.classList.remove('done');
+                    android_refreshNoSelection();
+                    refreshSize();
+                }, 2000);
+            }
+        }, 1000);
+    }
+
+    // ── Selected object ── //
+    /**
+     * Shows the placeholder of the object area, with a text that depends on the situation:
+     * <ul>
+     *   <li>not calibrated: the steps of the calibration;</li>
+     *   <li>calibrated, empty list: how to add objects;</li>
+     *   <li>calibrated, list not empty: invitation to select an object.</li>
+     * </ul>
+     * Called by the Java code (<code>JSInterface.addClickedObject</code>) and after the object card is closed.
+     */
+    function android_refreshNoSelection() {
+        if (is_calibrated) {
+            if (queue_list.children.length > 0) {
+                no_selection_icon.textContent = 'clear_all';
+                no_selection_text.textContent = 'Aucun objet sélectionné';
+                no_selection_sub.textContent = "Cliquez sur un objet de la liste pour plus d'options";
+            } else {
+                no_selection_icon.textContent = 'block';
+                no_selection_text.textContent = 'La liste est vide';
+                no_selection_sub.textContent = "Sélectionnez un objet dans l'application ou via Horizons pour l'ajouter à la file d'observation";
+            }
+        } else {
+            no_selection_icon.textContent = 'compass_calibration';
+            no_selection_text.textContent = 'Calibration';
+            no_selection_sub.innerHTML = `1. Sélectionnez au moins 3 étoiles dans l'application.<br>2. Pointez le télescope précisément sur chaque étoile.<br>3. Appuyez sur le bouton de confirmation pour enregistrer.<br>Attention : vous ne pourrez plus changer vos points de calibration une fois le processus terminé !`;
+        }
+        no_selection_footer.classList.remove('hidden');
+    }
+
+    /**
+     * Opens or closes the card of the selected object. Called by the Java code.
+     * The second line of the card lists the available values among: magnitude, RA, DEC and NORAD number.
+     * @param {boolean} enable - <code>true</code> to open the card, <code>false</code> to close it (with an animation)
+     * @param {Object} [item] - object to display, as built by <code>RealAstronomy.serializeSkyObject</code>:
+     *     <code>title</code>, <code>type_icon</code>, <code>type_name</code>, <code>is_calib_point</code>,
+     *     and if available <code>mag</code>, <code>ra</code>, <code>dec</code>, <code>norad</code>
+     */
+    function android_toggleObjectCard(enable, item) {
+        if (!enable) {
+            obj_card.style.animation = "card-pop-out 0.25s ease-in";
+            setTimeout(() => {
+                obj_card.classList.add('hidden');
+                android_refreshNoSelection();
+                obj_card.style.animation = "none";
+                refreshSize();
+            }, 250);
+        } else {
+            console.assert(item);
+            no_selection_footer.classList.add('hidden');
+
+            obj_card.querySelector('#obj-name').textContent = item.title;
+            obj_card.querySelector('#obj-type-icon').textContent = item.type_icon;
+            obj_card.querySelector('#obj-type-label').textContent = item.type_name;
+            obj_card.querySelector('#obj-calib-badge').classList.toggle('hidden', !item.is_calib_point);
+
+            const obj_name_sub = obj_card.querySelector('#obj-name-sub');
+            obj_name_sub.textContent = '';
+            if (item.mag) {
+                let addpt = obj_name_sub.textContent !== '';
+                obj_name_sub.textContent += (addpt ? ' • ' : '') + `MAG ${item.mag}`;
+            }
+            if (item.ra) {
+                let addpt = obj_name_sub.textContent !== '';
+                obj_name_sub.textContent += (addpt ? ' • ' : '') + `RA ${item.ra}`;
+            }
+            if (item.dec) {
+                console.log("dec: " + item.dec);
+                let addpt = obj_name_sub.textContent !== '';
+                obj_name_sub.textContent += (addpt ? ' • ' : '') + `DEC ${item.dec}`;
+            }
+            if (item.norad) {
+                let addpt = obj_name_sub.textContent !== '';
+                obj_name_sub.textContent += (addpt ? ' • ' : '') + `NORAD ID ${item.norad}`;
+            }
+
+            obj_card.classList.remove('hidden');
+            void obj_card.offsetWidth; // Force a reflow, so that the animation starts again
+            obj_card.style.animation = "fade-up .35s ease";
+            setTimeout(() => obj_card.style.animation = "none", 350);
+            refreshSize();
+        }
+    }
+
+    // ── Observation list ── //
+    /**
+     * Adds an object at the end of the list, with a slide-in animation. Called by the Java code each time
+     * an object is added to the list (<code>RealAstronomy.SkyObjectSet.add</code>).
+     * <ul>
+     *   <li>the delete button removes the object, on the Java side too (<code>Android.deleteObject</code>);</li>
+     *   <li>once the telescope is calibrated, a tap on the object opens its card (<code>Android.toggleObjectCard</code>).</li>
+     * </ul>
+     * @param {Object} item - object, as built by <code>RealAstronomy.serializeSkyObject</code>:
+     *     <code>id</code>, <code>type</code>, <code>title</code>, <code>type_icon</code>, <code>type_name</code>
+     */
+    function android_addQueueElement(item) {
+        const index = queue_list.children.length;
+
+        const htmlItem = document.createElement("div");
+        htmlItem.id = "q-item-" + String(index);
+        htmlItem.className = "queue-item";
+        htmlItem.style.animation = "none";
+
+        htmlItem.innerHTML = `
+            <span class="material-symbols-outlined" style="font-size:15px; color:var(--accent);">${item.type_icon}</span>
+            <div class="q-info">
+              <div class="q-name">
+                ${item.title}
+                <span class="hidden" id="calib-dot" style="color:var(--amber);font-size:8px;margin-left:2px;">★</span>
+                <span class="hidden" id="lock-note" style="color:var(--green);font-size:5px;font-family:var(--font-mono);letter-spacing:1px;margin-left:auto;display:block;margin-top:1px;">— CALIBRÉE</span>
+              </div>
+              <div class="q-type">${item.type_name}</div>
+            </div>
+            <div class="q-actions">
+              <button class="q-btn del">
+                <span class="material-symbols-outlined" style="font-size:15px;">delete</span>
+              </button>
+            </div>`;
+
+        const delBtn = htmlItem.querySelector(".q-btn.del");
+        delBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            delBtn.classList.add('glow');
+            setTimeout(() => {
+                delBtn.classList.remove('glow');
+                htmlItem.style.animation = "slide-out-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+                setTimeout(() => {
+                    htmlItem.style.animation = 'none';
+                    Android.deleteObject(item.id, item.type);
+                    htmlItem.remove();
+
+                    const length = queue_list.children.length;
+                    q_count.textContent = String(length) + " objet" + (length > 1 ? 's' : '');
+                    obj_list_header.classList.toggle('hidden', length <= 0);
+                    queue_list.classList.toggle('hidden', length <= 0);
+                    console.log("len: " + length);
+                    refreshSize();
+                }, 400);
+            }, 300);
+        });
+
+        htmlItem.addEventListener("click", () => {
+            if (is_calibrated) {
+                htmlItem.classList.add('glow');
+                htmlItem.style.animation = "tap-scale 0.3s ease-out";
+                setTimeout(() => {
+                    htmlItem.classList.remove("glow");
+                    htmlItem.style.animation = 'none';
+                    Android.toggleObjectCard(item.id, item.type);
+                }, 300);
+            }
+        });
+
+        obj_list_header.classList.remove('hidden');
+        queue_list.classList.remove('hidden');
+        q_count.textContent = String(index + 1) + " objet" + (index + 1 > 1 ? 's' : '');
+        void queue_list.offsetWidth; // Force a reflow BEFORE starting the animation
+        htmlItem.style.animation = "slide-in-left 0.25s ease-out";
+        queue_list.appendChild(htmlItem);
+        setTimeout(() => htmlItem.style.animation = "none", 250);
+        setTimeout(() => updateNavArrows('queue-list', 'q-up', 'q-down'), 50);
+        refreshSize();
+    }
+
+    // ═══════════════════════════════════ 6. SCREEN 2 — SETTINGS ═══════════════════════════════════ //
+    // toggleSettings() and onBarlowChange(), called by this screen in the HTML, are not defined yet.
+
+    // ═════════════════════════════════ 7. SCREEN 3 — JPL HORIZONS ═════════════════════════════════ //
+
+    // ── State and DOM references ── //
+    /** Objects of the results ticked by the user, sent to the Java code by the "Add to the list" button. */
+    let hzCheckedItems = new Set();
+    const hz_input = document.querySelector("#hz-input");
+    const hz_search_btn = document.querySelector("#hz-search-btn");
+    const hz_loader = document.querySelector("#hz-loader");
+    const hz_results_wrap = document.querySelector("#hz-results-wrap");
+    const hz_list = document.querySelector("#hz-list");
+    const hz_results_count = document.querySelector("#hz-results-count");
+    const hz_add_badge = document.querySelector("#hz-add-badge");
+    const hz_add_btn = document.querySelector("#hz-add-btn");
+
+    // ── Functions ── //
+    /**
+     * Opens or closes the Horizons screen ("Add via JPL Horizons" button, or back button).
+     * The settings button is hidden meanwhile, and the menu takes the keyboard focus for the search field.
+     * @param {boolean} enable - <code>true</code> to open the screen
+     */
+    function toggleHzScreen(enable) {
+        if (enable) toggleScreenTransition('screen-3', 'screen-1');
+        else toggleScreenTransition('screen-1', 'screen-3');
+        btn_settings.classList.toggle('hidden', enable);
+        Android.requestFocus(enable);
+        refreshSize();
+    }
+
+    /**
+     * Locks the search field and shows the loader while Horizons answers.
+     * Called by the Java code (<code>JSInterface.searchHorizons</code>).
+     * @param {boolean} enable - <code>true</code> while a search is running
+     */
+    function android_toggleSearchState(enable) {
+        hz_search_btn.disabled = enable;
+        hz_input.disabled = enable;
+        hz_loader.classList.toggle('hidden', !enable);
+    }
+
+    /**
+     * Clears the previous results, the ticked objects and the error banner.
+     * Called by the Java code before a new search, and once the results are added to the list.
+     */
+    function android_clearPrevSearch() {
+        hzCheckedItems.clear();
+        hz_list.innerHTML = '';
+        hz_results_wrap.classList.add('hidden');
+        android_toggleError(false, 'hz-error', null);
+    }
+
+    /**
+     * Displays the answer of Horizons. Called by the Java code (<code>JSInterface.searchHorizons</code>).
+     * <ul>
+     *   <li><code>200</code>: one line per object, with a checkbox; a tap ticks or unticks the object;</li>
+     *   <li><code>404</code>: "no result" message;</li>
+     *   <li>any other code: error banner.</li>
+     * </ul>
+     * @param {Array<{hz_id: string, name: string}>} items - objects found
+     * @param {number} code - status of the search: <code>200</code>, <code>404</code> or an error code
+     * @param {?string} error_msg - error message, for the codes other than 200 and 404
+     */
+    function android_onHzResult(items, code, error_msg) {
+        android_toggleSearchState(false);
+        if (code === 200) {
+            hz_results_wrap.classList.remove('hidden');
+            hz_results_count.textContent = items.length;
+            items.forEach((obj, idx) => {
+                const uid = 'hz-cb-' + idx;
+                const item = document.createElement('div');
+                item.className = 'hz-item';
+                item.innerHTML = `
+                <label class="dobgo-checkbox">
+                  <input type="checkbox" id="${uid}">
+                  <div class="dobgo-checkbox-box"></div>
+                </label>
+                <div class="hz-item-info">
+                  <div class="hz-item-name">${obj.name}</div>
+                  <div class="hz-item-meta">${obj.hz_id}</div>
+                </div>`;
+                item.onclick = function() {
+                    const cb = item.querySelector('input[type="checkbox"]');
+                    cb.checked = !cb.checked;
+                    item.classList.toggle("checked", cb.checked);
+                    if (cb.checked) hzCheckedItems.add(obj);
+                    else hzCheckedItems.delete(obj);
+                    updateHzAddBtn();
+                };
+                hz_list.appendChild(item);
+            });
+            setTimeout(() => updateNavArrows('hz-list','hz-up','hz-down'), 50);
+            updateHzAddBtn();
+        } else if (code === 404) {
+            hz_results_wrap.classList.remove('hidden');
+            hz_list.innerHTML = `<div class="hz-empty">Aucun résultat trouvé</div>`;
+            hz_results_count.textContent = '0';
+            updateHzAddBtn();
+        } else {
+            android_toggleError(true, 'hz-error', "(" + code + ") " + error_msg);
+        }
+        refreshSize();
+    }
+
+    /** Updates the "Add to the list" button: number of ticked objects, disabled when there is none. */
+    function updateHzAddBtn() {
+        const size = hzCheckedItems.size;
+        hz_add_badge.textContent = size.toString();
+        hz_add_btn.disabled = (size === 0);
+    }
+
+    // ═════════════════════════════ 8. TEST HELPERS (DESKTOP BROWSER) ══════════════════════════════ //
+
+    /** Displays fake Horizons results, to test the screen in a desktop browser. */
+    function fakeSearch() {
+        const queryJsonString = '[{"hz_id":"501","name":"Io"},{"hz_id":"524","name":"Iocaste"},{"hz_id":"604","name":"Dione"},{"hz_id":"607","name":"Hyperion"},{"hz_id":"626","name":"Albiorix"},{"hz_id":"637","name":"Bebhionn"},{"hz_id":"-3","name":"Mars Orbiter Mission"},{"hz_id":"-6","name":"Pioneer 6"},{"hz_id":"-20","name":"Pioneer 8"},{"hz_id":"-23","name":"Pioneer 10"},{"hz_id":"-24","name":"Pioneer 11"},{"hz_id":"-76","name":"Mars Science Laboratory (spacecraft2011-070A"},{"hz_id":"-92","name":"ACE"},{"hz_id":"-1023","name":"Artemis I"},{"hz_id":"-1024","name":"Artemis II"},{"hz_id":"-70007","name":"BioSentinel"},{"hz_id":"-399050","name":"2015 PDC"},{"hz_id":"-125544","name":"International Space Station (spacec1998-067A"},{"hz_id":"-999742","name":"LISA Pathfinder Propulsion Module ("},{"hz_id":"-937001","name":"2017 PDC"},{"hz_id":"-937002","name":"2017 PDCa"},{"hz_id":"-937011","name":"2019 PDC"},{"hz_id":"-937012","name":"c2019 PDC"},{"hz_id":"-937014","name":"2021 PDC"},{"hz_id":"-937015","name":"2021 PDCa"},{"hz_id":"-937016","name":"2023 PDC"},{"hz_id":"-937017","name":"2023 PDCa"},{"hz_id":"-937018","name":"2023 PDCf"},{"hz_id":"-937019","name":"2024 PDC25"},{"hz_id":"-937020","name":"2024 PDC25a"},{"hz_id":"-937021","name":"TTX19"},{"hz_id":"-937022","name":"TTX19a"},{"hz_id":"-937023","name":"2022 TTX"}]';
+        android_onHzResult(JSON.parse(queryJsonString), null, 500);
+    }
+
+    // ═════════════════════════════════ 9. UNUSED — FORMER VERSION ═════════════════════════════════ //
+    // Variables and code of the former version of the observation list, kept for reference.
+
+    // ── Unused variables ── //
+    let isBtKeyPresent = false;
+    let isTrackingActive = false;
+    const queueData = new Map();
+    let selectedObjectName = null;
+    const p1_main_obj_area = document.querySelector("#p1-main-obj-area");
+
+    // ── Helper of the former list ── //
+    /** Turns a name into an id fragment: spaces become dashes, letters become lower case. */
+    function normalizeIdName(name) {
+        return name.replace(/\s/g, '-').toLowerCase();
+    }
+
+    // ── Former observation list (commented out) ── //
+    /*function updateNoSelection() {
+        no_selection.classList.toggle("hidden", false);
+        let icon; let title; let sub;
+        if (queueData.size === 0) {
+            icon = "clear_all";
+            title = "La liste est vide";
+            sub = "Sélectionnez un astre dans l'application pour l'ajouter à la file d'observation";
+        } else {
+            icon = "block";
+            title = "Aucun objet sélectionné";
+            sub = "Cliquez sur un objet de la liste pour plus d'options";
+        }
+        no_selection.querySelector(".material-symbols-outlined").textContent = icon;
+        no_selection.querySelector(".no-selection-text").textContent = title;
+        no_selection.querySelector(".no-selection-sub").textContent = sub;
+        refreshSize();
+    }
+
+    function initObservationList() {
+        p1_main_obj_area.style.animation = "none";
+        queue_list.classList.toggle("hidden", queueData.length === 0);
+        if (queueData.length !== 0) {
+            if (selectedObjectIdx === null) {
+                const no_selection = p1_main_obj_area.querySelector(".no-selection");
+                if (no_selection !== null) {
+                    setMainObjAreaEmpty(
+                        "block",
+                        "Aucun objet sélectionné",
+                        "Cliquez sur un objet de la liste pour plus d'options"
+                    );
+                } else {
+                    p1_main_obj_area.style.animation = "card-pop-out 0.25s ease-in";
+                    setTimeout(() => {
+                        setMainObjAreaEmpty(
+                            "block",
+                            "Aucun objet sélectionné",
+                            "Cliquez sur un objet de la liste pour plus d'options"
+                        );
+                        p1_main_obj_area.style.animation = "none";
+                    }, 250); // 0.25 s (duration of the animation)
+                }
+            } else {
+                const obj = queueData[selectedObjectIdx];
+                let actions = ''
+
+                const isCurrentPt = obj.is_calib_point;
+                if (obj.type === 1) {
+                    actions = `
+                        <button class="calib-btn${isCurrentPt ? ' glow' : ''}">
+                          <span class="material-symbols-outlined" style="font-size:18px;">pages</span>
+                          ${isCurrentPt ? "Supprimer la calibration" : "Calibrer ce point"}
+                        </button>`;
+                }
+
+                p1_main_obj_area.style.animation = "fade-up .35s ease";
+                p1_main_obj_area.innerHTML = `
+                    <div class="obj-card">
+                      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px;">
+                        <div class="obj-type-badge">
+                            <span class="material-symbols-outlined" style="font-size:15px;">${obj.type_icon}</span>
+                            ${obj.type_fr.toUpperCase()}
+                        </div>
+                        ${isCurrentPt ? `<span class="obj-type-badge calib-pt">★ CALIB</span>` : ''}
+                      </div>
+                      <div class="obj-name">${obj.name}</div>
+                      <div class="obj-name-sub">RA ${obj.ra} · DEC ${obj.dec} · MAG ${obj.mag}</div>
+                    </div>
+                    ${actions}`;
+                //RA ${obj.ra} · DEC ${obj.dec} · MAG ${obj.mag}
+
+                const calibBtn = p1_main_obj_area.querySelector(".calib-btn");
+                if (calibBtn != null) calibBtn.addEventListener("click", () => {
+                    calibBtn.style.animation = "tap-scale 0.3s ease-out";
+                    setTimeout(() => {
+                        calibBtn.style.animation="none";
+                        Android.updateCalibPoint(JSON.stringify(obj), selectedObjectIdx)
+                    }, 300);
+                });
+            }
+
+            queue_list.innerHTML = '';
+            queueData.forEach((obj, idx) => {
+                const isSelected = selectedObjectIdx === idx;
+                const canSelect = isCalibrated || obj.type === 1;
+                const calibDot = obj.is_calib_point ? `<span style="color:var(--amber);font-size:8px;margin-left:2px;">★</span>` : '';
+                const lockNote = !canSelect ? `<span style="color:var(--accent);font-size:6px;font-family:var(--font-mono);letter-spacing:1px;margin-left:auto;display:block;margin-top:1px;">— CALIBRATION REQUISE</span>` : '';
+
+                const item = document.createElement('div');
+                item.className = 'queue-item' + (isSelected ? ' focused' : '') + (!canSelect ? ' disabled' : '');
+                if (obj.isNewlyAdded) {
+                    item.style.animation = "slide-in-left 0.25s ease-out"
+                    obj.isNewlyAdded = false;
+                    setTimeout(() => item.style.animation = "none", 250);
+                }
+                else item.style.animation = "none";
+                item.innerHTML = `
+                    <span class="q-index">${String(idx+1)}</span>
+                    <div class="q-info">
+                      <div class="q-name${!canSelect ? ' disabled' : '' + (isSelected ? ' focused' : '')}">${obj.name}${calibDot}${lockNote}</div>
+                      <div class="q-type">${obj.type_fr}</div>
+                    </div>
+                    <div class="q-actions${obj.is_calib_point ? ' hidden' : ''}">
+                      <button class="q-btn del">
+                        <span class="material-symbols-outlined" style="font-size:15px;">delete</span>
+                      </button>
+                    </div>`;
+
+                const delBtn = item.querySelector(".q-btn.del");
+                delBtn.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    delBtn.classList.add('glow');
+
+                    setTimeout(() => {
+                        delBtn.classList.remove('glow');
+                        Android.deleteQueueElement(JSON.stringify(obj), idx);
+                    }, 300);
+                });
+
+                item.onclick = () => {
+                    item.classList.add('glow');
+                    item.style.animation = "tap-scale 0.3s ease-out";
+                    setTimeout(() => { item.classList.remove('glow');item.style.animation="none";selectItem(idx);}, 300);
+                }
+                queue_list.appendChild(item);
+            });
+        } else  {
+            const no_selection = p1_main_obj_area.querySelector(".no-selection");
+            if (no_selection !== null) {
+                setMainObjAreaEmpty(
+                    "clear_all",
+                    "La liste est vide",
+                    "Sélectionnez un astre dans l'application pour l'ajouter à la file d'observation"
+                );
+            } else {
+                p1_main_obj_area.style.animation = "card-pop-out 0.25s ease-in";
+                setTimeout(() => {
+                    setMainObjAreaEmpty(
+                        "clear_all",
+                        "La liste est vide",
+                        "Sélectionnez un astre dans l'application pour l'ajouter à la file d'observation"
+                    );
+                    p1_main_obj_area.style.animation = "none";
+                }, 250); // 0.25 s (duration of the animation)
+            }
+        }
+
+        q_count.textContent = queueData.length + ' objet' + (queueData.length > 1 ? 's' : '');
+        setTimeout(() => updateNavArrows('queue-list', 'q-up', 'q-down'), 50);
+        refreshSize();
+    }
+
+    function android_selectItem(item_name) {
+        const htmlObj = document.querySelector("#q-item-" + normalizeIdName(item_name));
+
+        if (selectedObjectName === item_name) {
+            unselectItem();
+            htmlObj.classList.remove("focused");
+            htmlObj.querySelector(".q-name").classList.remove("focused");
+        }
+        else if (htmlObj.classList.contains("disabled")) {
+            Android.showToast("Vous devez d'abord calibrer le télescope !");
+        } else {
+            htmlObj.classList.add("focused");
+            htmlObj.querySelector(".q-name").classList.add("focused");
+
+            const item = queueData.get(item_name);
+            no_selection.classList.add("hidden");
+            obj_card.classList.remove("hidden");
+            obj_card.style.animation = "fade-up .35s ease";
+
+            obj_card.querySelector(".material-symbols-outlined").textContent = item.type_icon;
+            obj_card.querySelector("#obj-type-label").textContent = item.type_fr;
+            obj_card.querySelector(".obj-type-badge.calib-pt").classList.toggle("hidden", !item.is_calib_point);
+            obj_card.querySelector(".obj-name").textContent = item.name;
+        }
+    }
+
+    function unselectItem() {
+        selectedObjectName = null;
+        obj_card.style.animation = "card-pop-out 0.25s ease-in";
+        setTimeout(() => {
+            obj_card.style.animation = "none";
+            obj_card.classList.add("hidden");
+            updateNoSelection();
+        }, 250)
+    }
+
+    function android_editQueueList(item, idx) {
+        queueData.splice(idx, 1, item);
+        initObservationList();
+    }
+
+    function android_removeQueueElement(item_name) {
+        const htmlObj = document.querySelector("#q-item-" + normalizeIdName(item_name));
+        htmlObj.style.animation = "slide-out-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+        setTimeout(() => {
+            queueData.delete(item_name);
+            htmlObj.remove();
+        }, 400);
+        if (selectedObjectName === item_name) unselectItem();
+    }
+
+    function fakeAddFromApp() {
+        const fakeObjects = [
+            { name: 'Véga',        type: 'Étoile',    isStar: true,  ra: '18h36m', dec: "+38°47'", mag: '0.0',  isCalibPt:  false },
+            { name: 'Jupiter',     type: 'Planète',   isStar: false, ra: '02h14m', dec: "+12°35'", mag: '-2.3', isCalibPt:  false },
+            { name: 'Arcturus',    type: 'Étoile',    isStar: true,  ra: '14h15m', dec: "+19°10'", mag: '-0.1', isCalibPt:  false },
+            { name: 'M42 — Orion', type: 'Nébuleuse', isStar: false, ra: '05h35m', dec: "-05°23'", mag: '4.0',  isCalibPt:  false },
+            { name: 'ISS',         type: 'Satellite', isStar: false, ra: '—',      dec: '—',       mag: '-6.0', isCalibPt:  false },
+            { name: 'Sirius',      type: 'Étoile',    isStar: true,  ra: '06h45m', dec: "-16°43'", mag: '-1.46', isCalibPt: false },
+            { name: 'Mars',        type: 'Planète',   isStar: false, ra: '21h10m', dec: "-22°30'", mag: '-1.0',  isCalibPt: false },
+            { name: 'Saturne',     type: 'Planète',   isStar: false, ra: '19h00m', dec: "-22°00'", mag: '0.5',   isCalibPt: false },
+            { name: 'Andromède',   type: 'Galaxie',   isStar: false, ra: '00h42m', dec: "+41°16'", mag: '3.4',   isCalibPt: false },
+            { name: 'Polaris',     type: 'Étoile',    isStar: true,  ra: '02h31m', dec: "+89°15'", mag: '2.0',   isCalibPt: false },
+            { name: 'Betelgeuse',  type: 'Étoile',    isStar: true,  ra: '05h55m', dec: "+07°24'", mag: '0.5',   isCalibPt: false },
+            { name: 'Rigel',       type: 'Étoile',    isStar: true,  ra: '05h14m', dec: "-08°12'", mag: '0.1',   isCalibPt: false },
+            { name: 'M13 — Hercule', type: 'Amas',    isStar: false, ra: '16h41m', dec: "+36°28'", mag: '5.8',   isCalibPt: false },
+            { name: 'Lune',        type: 'Satellite', isStar: false, ra: '—',      dec: '—',       mag: '-12.7', isCalibPt: false },
+            { name: 'Neptune',     type: 'Planète',   isStar: false, ra: '23h30m', dec: "-05°00'", mag: '7.8',   isCalibPt: false }
+        ];
+
+        const index = Math.floor(Math.random() * fakeObjects.length);
+        queueData.unshift(fakeObjects[index]);
+        initObservationList();
+    }*/
+</script>
+
+</body>
+</html>

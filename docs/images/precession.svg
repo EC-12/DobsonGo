@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" width="900" height="440" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2F6FDE"/></marker>
+    <marker id="green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2E9E6B"/></marker>
+    <marker id="ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1F2A44"/></marker>
+    <marker id="red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#E25C5C"/></marker>
+    <marker id="amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B07A0C"/></marker>
+    
+  </defs>
+  <rect x="1" y="1" width="898" height="438" rx="16" fill="#F7F9FC" stroke="#D0D7E2" stroke-width="2"/>
+  <text x="30" y="44" font-size="20" font-weight="700" fill="#1F2A44">Precession of the Earth's axis</text>
+  <text x="30" y="66" font-size="14" fill="#5A6478">The axis slowly traces a circle in the sky, and completes one turn in about 26,000 years</text>
+  <line x1="450" y1="300" x2="450" y2="86.4" stroke="#5A6478" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <line x1="450" y1="300" x2="370.6" y2="116.4" stroke="#5A6478" stroke-width="1" stroke-dasharray="2 4"/>
+  <path d="M370.6 116.4 A79.4 20 0 0 1 529.4 116.4" fill="none" stroke="#2F6FDE" stroke-width="2" stroke-dasharray="5 4"/>
+  <path d="M370.6 116.4 A79.4 20 0 0 0 529.4 116.4" fill="none" stroke="#2F6FDE" stroke-width="2.5"/>
+  <polyline points="410.3,133.8 417.7,134.7 425.5,135.5 433.5,136.0 441.7,136.3 450.0,136.4 458.3,136.3 466.5,136.0 474.5,135.5 482.3,134.7 489.7,133.8" fill="none" stroke="#2F6FDE" stroke-width="3" marker-end="url(#blue)"/>
+  <g transform="rotate(23.4 450 300)">
+    <ellipse cx="450" cy="300" rx="74" ry="66" fill="#4A7BD0" stroke="#1F2A44" stroke-width="2"/>
+    <ellipse cx="450" cy="300" rx="74" ry="15" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="5 4"/>
+    <line x1="450" y1="366" x2="450" y2="400" stroke="#1F2A44" stroke-width="2.5"/>
+  </g>
+  <line x1="450" y1="300" x2="529.4" y2="116.4" stroke="#1F2A44" stroke-width="3"/>
+  <path d="M450.0 205.0 A95 95 0 0 1 487.7 212.8" fill="none" stroke="#5A6478" stroke-width="1.5"/>
+  <text x="456" y="180" font-size="13" fill="#5A6478">23.4°</text>
+  <path d="M529.4295781269561 106.44907486320378 L532.4295781269561 113.44907486320378 L539.4295781269561 116.44907486320378 L532.4295781269561 119.44907486320378 L529.4295781269561 126.44907486320378 L526.4295781269561 119.44907486320378 L519.4295781269561 116.44907486320378 L526.4295781269561 113.44907486320378 Z" fill="#E8A317" stroke="#B07A0C" stroke-width="1"/>
+  <text x="545.4" y="112.4" font-size="14" font-weight="700" fill="#1F2A44">Pole Star</text>
+  <text x="545.4" y="128.4" font-size="12" fill="#5A6478">today</text>
+  <path d="M370.57042187304387 106.44907486320378 L373.57042187304387 113.44907486320378 L380.57042187304387 116.44907486320378 L373.57042187304387 119.44907486320378 L370.57042187304387 126.44907486320378 L367.57042187304387 119.44907486320378 L360.57042187304387 116.44907486320378 L367.57042187304387 113.44907486320378 Z" fill="#E8A317" stroke="#B07A0C" stroke-width="1"/>
+  <text x="354.6" y="112.4" font-size="14" font-weight="700" fill="#1F2A44" text-anchor="end">Vega</text>
+  <text x="354.6" y="128.4" font-size="12" fill="#5A6478" text-anchor="end">in about 12,000 years</text>
+  <text x="450" y="412" font-size="13" fill="#1F2A44" text-anchor="middle">Earth</text>
+  <text x="30" y="250" font-size="13" fill="#5A6478">The Sun and the Moon pull on the</text>
+  <text x="30" y="268" font-size="13" fill="#5A6478">Earth's equatorial bulge, which makes</text>
+  <text x="30" y="286" font-size="13" fill="#5A6478">its axis wobble like a spinning top.</text>
+  <text x="640" y="250" font-size="13" fill="#5A6478">As the axis moves, the celestial</text>
+  <text x="640" y="268" font-size="13" fill="#5A6478">equator and the March equinox point</text>
+  <text x="640" y="286" font-size="13" fill="#5A6478">move too: the whole RA/Dec grid</text>
+  <text x="640" y="304" font-size="13" fill="#5A6478">slowly shifts.</text>
+
+</svg>

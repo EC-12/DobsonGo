@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 574" width="900" height="574" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ray" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#E8A317"/>
+    </marker>
+  </defs>
+
+  <!-- Card -->
+  <rect x="1" y="1" width="898" height="572" rx="16" fill="#F7F9FC" stroke="#D0D7E2" stroke-width="2"/>
+
+  <!-- ===================== Panel A: Refractor ===================== -->
+  <text x="30" y="44" font-size="20" font-weight="700" fill="#1F2A44">Refractor: the light is bent by a lens</text>
+  <text x="30" y="86" font-size="13" fill="#B07A0C">Light from the sky</text>
+
+  <!-- Tube -->
+  <rect x="120" y="100" width="620" height="90" fill="#FFFFFF" stroke="#1F2A44" stroke-width="2.5"/>
+
+  <!-- Incoming rays -->
+  <g stroke="#E8A317" stroke-width="2" fill="none">
+    <path d="M30 110 L75 110 L120 110" marker-mid="url(#ray)"/>
+    <path d="M30 128 L75 128 L120 128" marker-mid="url(#ray)"/>
+    <path d="M30 162 L75 162 L120 162" marker-mid="url(#ray)"/>
+    <path d="M30 180 L75 180 L120 180" marker-mid="url(#ray)"/>
+    <!-- Converging after the lens -->
+    <path d="M120 110 L410 127.5 L700 145" marker-mid="url(#ray)"/>
+    <path d="M120 128 L410 136.5 L700 145"/>
+    <path d="M120 162 L410 153.5 L700 145"/>
+    <path d="M120 180 L410 162.5 L700 145" marker-mid="url(#ray)"/>
+    <!-- Past the focus, into the eyepiece -->
+    <path d="M700 145 L780 136" opacity="0.8"/>
+    <path d="M700 145 L780 154" opacity="0.8"/>
+    <path d="M780 136 L812 136" opacity="0.8"/>
+    <path d="M780 154 L812 154" opacity="0.8"/>
+  </g>
+
+  <!-- Objective lens -->
+  <ellipse cx="120" cy="145" rx="9" ry="52" fill="#CFE8F7" stroke="#1F2A44" stroke-width="2"/>
+
+  <!-- Eyepiece -->
+  <rect x="740" y="127" width="46" height="36" fill="#E3E8F0" stroke="#1F2A44" stroke-width="2"/>
+  <ellipse cx="780" cy="145" rx="4" ry="14" fill="#CFE8F7" stroke="#1F2A44" stroke-width="1.5"/>
+
+  <!-- Focus point -->
+  <circle cx="700" cy="145" r="4.5" fill="#E8A317" stroke="#1F2A44" stroke-width="1"/>
+
+  <!-- Eye (looking left) -->
+  <g transform="translate(838,145)">
+    <path d="M-22 0 Q0 -18 22 0 Q0 18 -22 0 Z" fill="#FFFFFF" stroke="#1F2A44" stroke-width="2"/>
+    <circle cx="-6" cy="0" r="7" fill="#2F6FDE"/>
+    <circle cx="-6" cy="0" r="3.2" fill="#1F2A44"/>
+  </g>
+
+  <!-- Labels A -->
+  <g font-size="14" fill="#1F2A44" text-anchor="middle">
+    <line x1="120" y1="199" x2="120" y2="207" stroke="#5A6478" stroke-width="1.5"/>
+    <text x="120" y="224">Objective lens</text>
+    <line x1="700" y1="152" x2="700" y2="207" stroke="#5A6478" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <text x="690" y="224">Focus</text>
+    <line x1="764" y1="166" x2="764" y2="207" stroke="#5A6478" stroke-width="1.5"/>
+    <text x="772" y="224">Eyepiece</text>
+  </g>
+
+  <!-- Separator -->
+  <line x1="30" y1="252" x2="870" y2="252" stroke="#D0D7E2" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- ===================== Panel B: Newtonian ===================== -->
+  <text x="30" y="288" font-size="20" font-weight="700" fill="#1F2A44">Newtonian reflector: the light is bounced by mirrors</text>
+  <text x="30" y="392" font-size="13" fill="#B07A0C">Light from the sky</text>
+
+  <!-- Tube (open at the left end) -->
+  <rect x="80" y="400" width="680" height="120" fill="#FFFFFF"/>
+  <g stroke="#1F2A44" stroke-width="2.5" fill="none">
+    <line x1="80" y1="400" x2="760" y2="400"/>
+    <line x1="80" y1="520" x2="760" y2="520"/>
+    <line x1="760" y1="400" x2="760" y2="520"/>
+  </g>
+
+  <!-- Focuser and eyepiece on the side of the tube -->
+  <rect x="186" y="370" width="28" height="30" fill="#E3E8F0" stroke="#1F2A44" stroke-width="2"/>
+  <rect x="190" y="336" width="20" height="34" fill="#C9D2DF" stroke="#1F2A44" stroke-width="2"/>
+
+  <!-- Rays -->
+  <g stroke="#E8A317" stroke-width="2" fill="none">
+    <!-- Incoming, down the open tube to the primary mirror -->
+    <path d="M30 410 L420 410 L736.1 410" marker-mid="url(#ray)"/>
+    <path d="M30 430 L420 430 L739.9 430" marker-mid="url(#ray)"/>
+    <path d="M30 490 L420 490 L739.9 490" marker-mid="url(#ray)"/>
+    <path d="M30 510 L420 510 L736.1 510" marker-mid="url(#ray)"/>
+    <!-- Reflected by the primary, converging towards the secondary -->
+    <path d="M736.1 410 L464.7 431.7 L193.3 453.3" opacity="0.85" marker-mid="url(#ray)"/>
+    <path d="M739.9 430 L467.9 443 L195.9 455.9" opacity="0.85"/>
+    <path d="M739.9 490 L472.2 477.3 L204.5 464.5" opacity="0.85"/>
+    <path d="M736.1 510 L472 488.9 L207.8 467.8" opacity="0.85" marker-mid="url(#ray)"/>
+    <!-- Sent up by the secondary into the eyepiece -->
+    <path d="M193.3 453.3 L200 370"/>
+    <path d="M195.9 455.9 L200 370"/>
+    <path d="M204.5 464.5 L200 370"/>
+    <path d="M207.8 467.8 L200 370"/>
+  </g>
+
+  <!-- Primary mirror (concave) -->
+  <path d="M734 402 Q750 460 734 518 L746 518 Q762 460 746 402 Z" fill="#9EC5E8" stroke="#1F2A44" stroke-width="2"/>
+
+  <!-- Secondary mirror (flat, 45 degrees) -->
+  <line x1="180.5" y1="448.5" x2="212.5" y2="480.5" stroke="#1F2A44" stroke-width="3"/>
+  <line x1="184" y1="444" x2="216" y2="476" stroke="#9EC5E8" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Focus point -->
+  <circle cx="200" cy="370" r="4" fill="#E8A317" stroke="#1F2A44" stroke-width="1"/>
+
+  <!-- Eye (looking down into the eyepiece) -->
+  <g transform="translate(200,318)">
+    <path d="M-22 0 Q0 -16 22 0 Q0 16 -22 0 Z" fill="#FFFFFF" stroke="#1F2A44" stroke-width="2"/>
+    <circle cx="0" cy="3" r="7" fill="#2F6FDE"/>
+    <circle cx="0" cy="4" r="3.2" fill="#1F2A44"/>
+  </g>
+
+  <!-- Labels B -->
+  <g font-size="14" fill="#1F2A44">
+    <text x="228" y="357">Eyepiece</text>
+    <line x1="222" y1="352" x2="212" y2="352" stroke="#5A6478" stroke-width="1.5"/>
+    <text x="236" y="385">Secondary mirror (flat, tilted at 45°)</text>
+    <line x1="234" y1="389" x2="214" y2="446" stroke="#5A6478" stroke-width="1.5"/>
+    <text x="760" y="548" text-anchor="end">Primary mirror (concave)</text>
+    <line x1="748" y1="522" x2="748" y2="532" stroke="#5A6478" stroke-width="1.5"/>
+    <text x="30" y="548" fill="#5A6478" font-size="13">The tube is open at the front: light travels all the way down to the main mirror and back up.</text>
+  </g>
+</svg>
